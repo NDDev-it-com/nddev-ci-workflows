@@ -1,0 +1,62 @@
+name: cross-platform-smoke
+
+# Reusable cross-platform smoke test for BOTH tiers.
+# Runs a caller-provided command across an OS matrix (ubuntu/macos/windows).
+
+on:
+  workflow_call:
+    inputs:
+      os_list:
+        description: 'JSON array of runner labels.'
+        type: string
+        default: '["ubuntu-latest","macos-latest","windows-latest"]'
+      python_version:
+        type: string
+        default: '3.13'
+      setup_python:
+        type: boolean
+        default: true
+      command:
+        description: 'Shell command to run on each OS (bash shell).'
+        type: string
+        default: 'python -c "import sys; print(sys.platform)"'
+      enable_harden_runner:
+        type: boolean
+        default: true
+
+permissions: {}
+
+jobs:
+  smoke:
+    name: smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.os_list) }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner && runner.os == 'Linux' }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        if: ${{ inputs.setup_python }}
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Run smoke command
+        shell: bash
+        env:
+          SMOKE_COMMAND: ${{ inputs.command }}
+        run: bash -c "$SMOKE_COMMAND"

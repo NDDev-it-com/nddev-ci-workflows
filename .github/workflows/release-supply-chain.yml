@@ -1,0 +1,158 @@
+name: release-supply-chain
+
+# Reusable release supply-chain hardening for BOTH tiers: deterministic archive,
+# SPDX SBOM, SHA256SUMS, SLSA build provenance attestations, and GitHub Release
+# publication. The caller triggers on a numeric tag and passes the version.
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Numeric SemVer X.Y.Z (must equal the tag / VERSION file).'
+        type: string
+        required: true
+      package_name:
+        type: string
+        required: true
+      archive_paths:
+        description: 'Space-separated tracked paths to include in the archive.'
+        type: string
+        default: 'README.md LICENSE NOTICE VERSION CHANGELOG.md .github'
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      notes_file:
+        description: 'Optional path to release notes; extracted from CHANGELOG if empty.'
+        type: string
+        default: ''
+
+permissions: {}
+
+jobs:
+  release:
+    name: Build and publish release bundle
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      PACKAGE_NAME: ${{ inputs.package_name }}
+      ARCHIVE_PATHS: ${{ inputs.archive_paths }}
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          fetch-depth: 0
+          # Publication uses gh with GITHUB_TOKEN; no git credentials are needed.
+          persist-credentials: false
+
+      - name: Validate release version
+        run: |
+          set -euo pipefail
+          if ! printf '%s' "$RELEASE_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "version '$RELEASE_VERSION' must be numeric SemVer X.Y.Z" >&2
+            exit 1
+          fi
+          if [ -f VERSION ]; then
+            file_version="$(tr -d '[:space:]' < VERSION)"
+            if [ "$RELEASE_VERSION" != "$file_version" ]; then
+              echo "version '$RELEASE_VERSION' != VERSION '$file_version'" >&2
+              exit 1
+            fi
+          fi
+
+      - name: Build deterministic archive, SBOM, and checksums
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          archive="dist/${PACKAGE_NAME}-${RELEASE_VERSION}.tar.gz"
+          # shellcheck disable=SC2086
+          tar --sort=name \
+            --mtime="$(git log -1 --format=%cI)" \
+            --owner=0 --group=0 --numeric-owner \
+            --exclude='.git' --exclude='dist' \
+            -cf - $ARCHIVE_PATHS | gzip -n > "$archive"
+
+          python3 - <<'PY'
+          import os, json
+          from pathlib import Path
+          v = os.environ["RELEASE_VERSION"]; name = os.environ["PACKAGE_NAME"]
+          archive = f"{name}-{v}.tar.gz"
+          created = None
+          try:
+              import subprocess
+              created = subprocess.check_output(["git", "log", "-1", "--format=%cI"], text=True).strip()
+          except Exception:
+              created = "1970-01-01T00:00:00Z"
+          manifest = {
+              "package_name": name,
+              "version": v,
+              "source_commit_time": created,
+              "required_artifacts": [archive, "sbom.spdx.json", "release-manifest.json", "SHA256SUMS"],
+          }
+          Path("dist/release-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+          sbom = {
+              "spdxVersion": "SPDX-2.3",
+              "SPDXID": "SPDXRef-DOCUMENT",
+              "name": name,
+              "packages": [{
+                  "SPDXID": f"SPDXRef-Package-{name}",
+                  "name": name,
+                  "versionInfo": v,
+                  "downloadLocation": f"git+https://github.com/{os.environ.get('GITHUB_REPOSITORY','')}.git",
+              }],
+              "creationInfo": {"created": created, "creators": ["Tool: nddev-ci-workflows release-supply-chain"]},
+          }
+          Path("dist/sbom.spdx.json").write_text(json.dumps(sbom, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          ( cd dist && sha256sum ./* > SHA256SUMS )
+
+      - name: Attest release archive
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
+        with:
+          subject-path: dist/${{ inputs.package_name }}-${{ inputs.version }}.tar.gz
+
+      - name: Attest SPDX SBOM
+        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
+        with:
+          subject-path: dist/sbom.spdx.json
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: release-${{ inputs.version }}
+          path: dist
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES_FILE: ${{ inputs.notes_file }}
+        run: |
+          set -euo pipefail
+          if [ -z "$NOTES_FILE" ] && [ -f CHANGELOG.md ]; then
+            awk -v version="${RELEASE_VERSION}" '
+              $0 ~ "^## \\[" version "\\]" { flag = 1; next }
+              flag && /^## \[/ { exit }
+              flag { print }
+            ' CHANGELOG.md > dist/release-notes.md || true
+            NOTES_FILE=dist/release-notes.md
+          fi
+          if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_VERSION" dist/* --clobber
+          else
+            gh release create "$RELEASE_VERSION" \
+              --verify-tag \
+              --title "$RELEASE_VERSION" \
+              ${NOTES_FILE:+--notes-file "$NOTES_FILE"} \
+              dist/*
+          fi

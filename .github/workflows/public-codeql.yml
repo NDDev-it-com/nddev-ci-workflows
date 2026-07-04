@@ -1,0 +1,66 @@
+name: public-codeql
+
+# Reusable CodeQL code-scanning for PUBLIC repositories (free GitHub code scanning).
+# Caller example:
+#   jobs:
+#     codeql:
+#       uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/public-codeql.yml@<full-sha>
+#       with:
+#         languages: '["python","actions"]'
+
+on:
+  workflow_call:
+    inputs:
+      languages:
+        description: 'JSON array of CodeQL languages, e.g. ["python","actions"].'
+        type: string
+        default: '["actions"]'
+      queries:
+        description: 'CodeQL query suite.'
+        type: string
+        default: 'security-and-quality'
+      runner:
+        description: 'Runner label.'
+        type: string
+        default: 'ubuntu-latest'
+      egress_policy:
+        description: 'harden-runner egress policy: audit or block.'
+        type: string
+        default: 'audit'
+
+permissions: {}
+
+jobs:
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(inputs.languages) }}
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: ${{ inputs.egress_policy }}
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a  # v4.36.3
+        with:
+          languages: ${{ matrix.language }}
+          queries: ${{ inputs.queries }}
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a  # v4.36.3
+        with:
+          category: "/language:${{ matrix.language }}"

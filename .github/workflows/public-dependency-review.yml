@@ -1,0 +1,45 @@
+name: public-dependency-review
+
+# Reusable Dependency Review for PUBLIC repositories (free on public repos).
+# Caller must trigger on pull_request.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      fail_on_severity:
+        description: 'Minimum severity that fails the check: low, moderate, high, critical.'
+        type: string
+        default: 'moderate'
+      comment_summary_in_pr:
+        type: string
+        default: 'on-failure'
+
+permissions: {}
+
+jobs:
+  dependency-review:
+    name: Dependency review
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294  # v5.0.0
+        with:
+          fail-on-severity: ${{ inputs.fail_on_severity }}
+          comment-summary-in-pr: ${{ inputs.comment_summary_in_pr }}

@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: reusable-workflow contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            agent.api.stepsecurity.io:443
+            github.com:443
+            api.github.com:443
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Verify every reusable workflow declares workflow_call
+        run: |
+          set -euo pipefail
+          rc=0
+          for f in .github/workflows/public-*.yml .github/workflows/secret-scan.yml \
+                   .github/workflows/actionlint.yml .github/workflows/zizmor.yml \
+                   .github/workflows/cross-platform-smoke.yml .github/workflows/private-static.yml \
+                   .github/workflows/release-supply-chain.yml; do
+            [ -f "$f" ] || { echo "missing reusable workflow: $f" >&2; rc=1; continue; }
+            if ! grep -qE '^\s*workflow_call:' "$f"; then
+              echo "reusable workflow missing 'on: workflow_call': $f" >&2
+              rc=1
+            fi
+          done
+          exit "$rc"
+
+  actionlint:
+    uses: ./.github/workflows/actionlint.yml
+
+  zizmor:
+    permissions:
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/zizmor.yml
+
+  ci-gate:
+    name: ci-gate
+    needs: [contract, actionlint, zizmor]
+    runs-on: ubuntu-latest
+    if: always()
+    permissions:
+      contents: read
+    steps:
+      - name: Aggregate required results
+        run: |
+          set -euo pipefail
+          for r in "${{ needs.contract.result }}" "${{ needs.actionlint.result }}" "${{ needs.zizmor.result }}"; do
+            if [ "$r" != "success" ]; then
+              echo "required job failed: $r" >&2
+              exit 1
+            fi
+          done
+          echo "ci-gate passed"

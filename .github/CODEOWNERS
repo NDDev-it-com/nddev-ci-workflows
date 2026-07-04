@@ -1,0 +1,6 @@
+# Every change to this reusable-workflow library is owner-reviewed.
+* @rldyourmnd
+
+# Workflow definitions are the security-critical product surface.
+/.github/workflows/ @rldyourmnd
+/.github/branch-protection/ @rldyourmnd

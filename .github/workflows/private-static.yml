@@ -1,0 +1,52 @@
+name: private-static
+
+# Reusable lightweight static validation for PRIVATE repositories.
+# Deliberately zero-cost: a single Ubuntu job, no paid GitHub Advanced Security
+# features, no matrix, no caching. Runs a caller-provided validation command.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      python_version:
+        type: string
+        default: '3.13'
+      setup_python:
+        type: boolean
+        default: true
+      command:
+        description: 'Validation command to run (bash shell).'
+        type: string
+        required: true
+      timeout_minutes:
+        type: number
+        default: 15
+
+permissions: {}
+
+jobs:
+  static:
+    name: static validation
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        if: ${{ inputs.setup_python }}
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Run validation
+        shell: bash
+        env:
+          VALIDATION_COMMAND: ${{ inputs.command }}
+        run: bash -c "$VALIDATION_COMMAND"

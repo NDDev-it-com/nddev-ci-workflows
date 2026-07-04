@@ -1,0 +1,79 @@
+name: zizmor-no-sarif
+
+# Reusable zizmor GitHub Actions security static analysis WITHOUT SARIF upload.
+# Least-privilege variant for the PRIVATE FREE tier: it requests only
+# `contents: read` (code scanning is a paid feature on private repos, so there
+# is no `security-events: write`). Findings are enforced as a build gate and
+# printed to the log instead of uploaded to code scanning.
+#
+# Public repos and private repos with GitHub Code Security should use
+# zizmor-sarif.yml to get findings in the Security tab.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      zizmor_version:
+        type: string
+        default: '1.26.1'
+      persona:
+        description: 'zizmor persona: regular, pedantic, or auditor.'
+        type: string
+        default: 'regular'
+      min_severity:
+        description: 'Minimum finding severity to report: unknown, informational, low, medium, high.'
+        type: string
+        default: 'low'
+      target:
+        description: 'Path zizmor analyzes.'
+        type: string
+        default: '.'
+      enable_harden_runner:
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: zizmor (no SARIF)
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: "3.13"
+
+      - name: Install zizmor (pinned)
+        env:
+          ZIZMOR_VERSION: ${{ inputs.zizmor_version }}
+        run: python3 -m pip install "zizmor==${ZIZMOR_VERSION}"
+
+      - name: Run zizmor (plain, enforced)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ZIZMOR_PERSONA: ${{ inputs.persona }}
+          ZIZMOR_MIN_SEVERITY: ${{ inputs.min_severity }}
+          ZIZMOR_TARGET: ${{ inputs.target }}
+        run: |
+          set -euo pipefail
+          zizmor \
+            --persona "${ZIZMOR_PERSONA}" \
+            --min-severity "${ZIZMOR_MIN_SEVERITY}" \
+            "${ZIZMOR_TARGET}"

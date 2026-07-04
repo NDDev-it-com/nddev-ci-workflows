@@ -227,6 +227,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
+      - "Use OS-specific command overrides when a smoke command is not portable across Linux, macOS, and Windows"
       - "macOS and Windows runner minutes are billed at a multiplier on private repos"
       - "harden-runner step only runs on the Linux matrix leg"
     deprecations: null

@@ -62,7 +62,9 @@ Scorecard scores your repository against supply-chain best practices (pinned
 actions, branch protection, token permissions, etc.). Use `public-scorecard.yml`
 for SARIF/code-scanning upload, or `public-scorecard-json.yml` when Scorecard
 should remain a JSON artifact/check signal instead of a persistent
-code-scanning alert source.
+code-scanning alert source. `public-scorecard-json.yml` defaults
+`publish_results: false` because reusable workflow calls do not satisfy the
+OpenSSF Scorecard webapp workflow-shape verification required for publishing.
 
 > **Trigger constraint:** Scorecard officially supports only `push` and
 > `schedule` (default branch). `pull_request` and `workflow_dispatch` are

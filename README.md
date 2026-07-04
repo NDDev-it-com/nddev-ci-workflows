@@ -94,7 +94,9 @@ jobs:
 OSSF Scorecard runs **on push-to-default + schedule only** (`pull_request` is
 experimental and unsupported by the action), so keep it in its own file. Use
 `public-scorecard-json.yml` when Scorecard should be a check/artifact signal
-instead of a persistent code-scanning alert source:
+instead of a persistent code-scanning alert source. The JSON workflow defaults
+`publish_results: false` because reusable workflow calls do not satisfy the
+OpenSSF Scorecard webapp verification shape for publishing:
 
 ```yaml
 # .github/workflows/scorecard.yml

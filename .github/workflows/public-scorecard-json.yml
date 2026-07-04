@@ -16,9 +16,9 @@ on:
         type: string
         default: 'ubuntu-latest'
       publish_results:
-        description: 'Publish results to the OpenSSF Scorecard API (public repos).'
+        description: 'Publish results to the OpenSSF Scorecard API. Disabled by default because reusable workflow calls do not satisfy Scorecard webapp verification shape.'
         type: boolean
-        default: true
+        default: false
       artifact_name:
         type: string
         default: 'scorecard-results'

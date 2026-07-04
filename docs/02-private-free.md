@@ -117,7 +117,9 @@ recommended posture for private repos — see
 Runs a caller command across an OS matrix. On private repos, **Windows and macOS
 minutes are billed at higher multipliers than Linux** (see
 [05 Runners](05-runners.md#cost-model)). Trim `os_list` to `["ubuntu-latest"]`
-to stay free-minimal, or accept the multiplier cost intentionally.
+to stay free-minimal, or accept the multiplier cost intentionally. Use
+`linux_command`, `macos_command`, or `windows_command` when one platform needs a
+lighter smoke than the default `command`.
 
 ## Self-hosted caveats
 

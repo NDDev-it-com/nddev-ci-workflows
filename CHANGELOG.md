@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-07-04
+
+### Added
+
+- `cross-platform-smoke.yml` now supports OS-specific command overrides
+  (`linux_command`, `macos_command`, `windows_command`) while preserving the
+  default `command` fallback.
+
+### Changed
+
+- `public-scorecard-json.yml` now defaults `publish_results` to `false`.
+  Reusable workflow callers keep Scorecard as a JSON artifact/check signal by
+  default, avoiding OpenSSF Scorecard webapp workflow-shape verification
+  failures.
+
 ## [0.2.2] - 2026-07-04
 
 ### Added

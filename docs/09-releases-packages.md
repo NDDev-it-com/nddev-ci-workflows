@@ -81,19 +81,13 @@ or PyPI token is stored** as a secret.
 - **PyPI** — configure a trusted publisher (repo + workflow) in the PyPI project
   settings, then publish with `id-token: write` and no `password`.
 - **npm** — configure the package for trusted publishing (OIDC) and publish from
-  the authorized workflow without an `NPM_TOKEN`.
+  the authorized workflow without an `NPM_TOKEN`. npm trusted publishing
+  currently supports GitHub-hosted runners, not self-hosted runners.
 
-```yaml
-jobs:
-  publish-pypi:
-    permissions:
-      id-token: write        # OIDC — mints the short-lived registry credential
-      contents: read
-    steps:
-      - uses: actions/checkout@<full-sha>
-      - run: python -m build
-      # upload via the trusted-publishing flow; no stored PyPI token
-```
+Copy-paste examples:
+
+- [`examples/release/npm-trusted-publishing.yml`](../examples/release/npm-trusted-publishing.yml)
+- [`examples/release/pypi-trusted-publishing.yml`](../examples/release/pypi-trusted-publishing.yml)
 
 This eliminates the most common package-registry compromise vector (leaked
 long-lived publish tokens). See

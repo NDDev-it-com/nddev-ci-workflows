@@ -136,6 +136,10 @@ These run on the push itself, catching mistakes earlier than a PR check.
   the protected branch and required checks run against the queue's candidate
   branch via the `merge_group` event (see
   [04 Actions core](04-actions-core.md#event-triggers-for-orchestration)).
+- **License compliance** entered public preview on 2026-06-30 for Enterprise
+  Cloud customers with GitHub Advanced Security Code Security. Treat it as a
+  ruleset-based supply-chain gate: pilot in evaluate mode, then require license
+  compliance check results before merge once policy false-positives are known.
 
 ---
 Last verified: 2026-07-04

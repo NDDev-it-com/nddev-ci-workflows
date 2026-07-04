@@ -43,6 +43,8 @@ See [`docs/01-public-oss-free.md`](docs/01-public-oss-free.md),
 | Monorepo changed-paths router | `monorepo-changed-paths.yml` | ✅ | ✅ | ✅ |
 
 The machine-readable source of truth is [`catalog/capabilities.yml`](catalog/capabilities.yml).
+Generated mirrors live in [`docs/generated/`](docs/generated/) and are checked by
+`scripts/generate_docs.py --check`.
 
 ## Usage
 
@@ -185,6 +187,7 @@ rulesets-first model and a migration guide from classic branch protection.
 ```
 docs/       CI/CD encyclopedia (public/private tiers, security, supply chain, governance, AI)
 catalog/    machine-readable capability + tools + deprecations catalog
+docs/generated/ catalog-derived matrices (do not edit by hand)
 .github/
   workflows/   reusable workflows (the product)
   rulesets/    branch/tag/push ruleset specs

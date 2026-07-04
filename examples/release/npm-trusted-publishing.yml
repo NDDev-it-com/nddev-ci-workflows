@@ -1,0 +1,30 @@
+# npm Trusted Publishing via OIDC.
+# Replace @<sha> with pinned full SHAs for actions. npm trusted publishing
+# currently requires GitHub-hosted runners; do not run this on self-hosted.
+name: release-npm
+on:
+  push:
+    tags: ["v*"]
+permissions: {}
+concurrency:
+  group: release-npm-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@<sha>
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@<sha>
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm publish

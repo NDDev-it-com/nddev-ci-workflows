@@ -94,7 +94,7 @@ capabilities:
     private_free: unavailable
     private_paid: available
     workflow: .github/workflows/public-dependency-review.yml
-    example: null
+    example: examples/public-oss/dependency-review.yml
     required_permissions:
       - "contents: read"
       - "pull-requests: write"
@@ -188,6 +188,27 @@ capabilities:
       - "Use zizmor-no-sarif.yml for private-free repositories to avoid code-scanning permissions"
       - "ci.yml uses the default regular persona; run pedantic locally for deeper manual audits"
       - "SARIF upload requires code scanning (GHAS) on private repos; use the no-SARIF variant there"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://github.com/woodruffw/zizmor"
+      - "https://docs.zizmor.sh"
+
+  - id: zizmor-no-sarif
+    name: zizmor workflow security scanner (no SARIF)
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/zizmor-no-sarif.yml
+    example: examples/private-free/security.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Findings are enforced in logs but not uploaded to code scanning"
+      - "Use zizmor-sarif.yml when code scanning SARIF upload is available"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -421,6 +442,28 @@ capabilities:
     sources:
       - "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets"
 
+  - id: merge-queue
+    name: Merge queue
+    cluster: governance
+    status: ga
+    public_oss: conditional
+    private_free: unavailable
+    private_paid: conditional
+    workflow: null
+    example: null
+    required_permissions: []
+    required_settings:
+      - "Branch protection or ruleset requires merge queue"
+      - "Required workflows include the merge_group event"
+    risks:
+      - "If a required check workflow lacks merge_group, queued merges cannot report the required status"
+      - "Available for organization-owned public repos and Enterprise Cloud private repos"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue"
+      - "https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#merge_group"
+
   - id: branch-protection-classic
     name: Branch protection (classic)
     cluster: governance
@@ -478,6 +521,86 @@ capabilities:
     last_verified: "2026-07-04"
     sources:
       - "https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/caching-dependencies-to-speed-up-workflows"
+
+  - id: step-level-parallel-execution
+    name: Actions step-level parallel execution
+    cluster: actions-core
+    status: preview
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: null
+    example: null
+    required_permissions: []
+    required_settings:
+      - "GitHub Actions runtime with parallel-step support"
+    risks:
+      - "Public preview since 2026-06-25; keep canonical workflows sequential until the syntax is broadly proven"
+      - "Parallel steps can change artifact/cache/log ordering assumptions"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/"
+
+  - id: hosted-runner-governance-controls
+    name: GitHub-hosted runner governance controls
+    cluster: runners
+    status: preview
+    public_oss: conditional
+    private_free: conditional
+    private_paid: conditional
+    workflow: null
+    example: null
+    required_permissions: []
+    required_settings:
+      - "Runner governance controls enabled in repository or organization settings"
+    risks:
+      - "Public preview controls should be documented and evaluated before becoming hard requirements"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://github.blog/changelog/2026-06-25-more-control-over-your-github-hosted-runners/"
+
+  - id: rhel-larger-runner-images
+    name: RHEL 9/10 larger-runner images
+    cluster: runners
+    status: preview
+    public_oss: paid
+    private_free: unavailable
+    private_paid: conditional
+    workflow: null
+    example: null
+    required_permissions: []
+    required_settings:
+      - "Larger runners enabled"
+      - "RHEL image selected for Linux x64 larger runner"
+    risks:
+      - "Public preview; larger runners remain metered for public and private repositories"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://github.blog/changelog/2026-06-25-red-hat-enterprise-linux-runner-images-are-now-in-public-preview/"
+
+  - id: license-compliance-preview
+    name: Open source license compliance
+    cluster: supply-chain
+    status: preview
+    public_oss: unavailable
+    private_free: unavailable
+    private_paid: conditional
+    workflow: null
+    example: null
+    required_permissions: []
+    required_settings:
+      - "GitHub Enterprise Cloud"
+      - "GitHub Advanced Security Code Security license"
+      - "License policy configured"
+    risks:
+      - "Public preview since 2026-06-30; ruleset blocking behavior should be piloted in evaluate mode"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://github.blog/changelog/2026-06-30-open-source-license-compliance-is-in-public-preview/"
 
   - id: agentic-workflows
     name: GitHub Agentic Workflows
@@ -541,7 +664,7 @@ capabilities:
     deprecations: "Fully retired 2026-07-30 (brownouts 2026-07-16 and 2026-07-23). Replacement: Agentic Workflows / Copilot Autofix / external LLM via OIDC"
     last_verified: "2026-07-04"
     sources:
-      - "https://docs.github.com/en/github-models"
+      - "https://github.blog/changelog/2026-07-01-github-models-is-being-fully-retired-on-july-30-2026/"
 
   - id: dependabot
     name: Dependabot version and security updates
@@ -590,7 +713,7 @@ capabilities:
     private_free: free
     private_paid: available
     workflow: .github/workflows/release-supply-chain.yml
-    example: null
+    example: examples/public-oss/release.yml
     required_permissions:
       - "contents: write"
       - "id-token: write"
@@ -606,6 +729,51 @@ capabilities:
       - "https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds"
       - "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
 
+  - id: npm-trusted-publishing
+    name: npm trusted publishing
+    cluster: releases-packages
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: null
+    example: examples/release/npm-trusted-publishing.yml
+    required_permissions:
+      - "id-token: write"
+      - "contents: read"
+    required_settings:
+      - "npm package trusted publisher configured"
+      - "GitHub-hosted runner"
+    risks:
+      - "Self-hosted runners are not currently supported by npm trusted publishing"
+      - "After trusted publishing is configured, restrict legacy token-based publishing"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://docs.npmjs.com/trusted-publishers/"
+
+  - id: pypi-trusted-publishing
+    name: PyPI trusted publishing
+    cluster: releases-packages
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: null
+    example: examples/release/pypi-trusted-publishing.yml
+    required_permissions:
+      - "id-token: write"
+      - "contents: read"
+    required_settings:
+      - "PyPI trusted publisher configured for the project and workflow"
+    risks:
+      - "Do not provide usernames, passwords, or API tokens in the trusted-publishing job"
+      - "Keep build and publish split so only the publishing job receives id-token: write"
+    deprecations: null
+    last_verified: "2026-07-04"
+    sources:
+      - "https://docs.pypi.org/trusted-publishers/using-a-publisher/"
+
   - id: python-ci
     name: Python CI
     cluster: actions-core
@@ -619,7 +787,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
       - "Private-repo runner minutes are metered beyond the included free allotment"
     deprecations: null
     last_verified: "2026-07-04"
@@ -639,7 +807,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -658,7 +826,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -677,7 +845,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -696,7 +864,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -715,7 +883,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -736,7 +904,7 @@ capabilities:
     required_settings:
       - "Code scanning enabled to upload the Trivy SARIF (optional; GHAS on private)"
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
       - "SARIF upload to code scanning is paid via GHAS on private repos"
     deprecations: null
     last_verified: "2026-07-04"
@@ -757,7 +925,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
       - "terraform plan/apply against real infra needs cloud OIDC and scoped credentials"
     deprecations: null
     last_verified: "2026-07-04"
@@ -777,7 +945,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -796,7 +964,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow not yet present on disk; canonical path reserved"
+      - "Workflow is present on disk and validated by generated workflow inventory"
       - "Path-filter matrices must fail safe (run everything) when the filter cannot resolve a merge base"
     deprecations: null
     last_verified: "2026-07-04"

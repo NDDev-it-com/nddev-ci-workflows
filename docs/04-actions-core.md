@@ -124,6 +124,19 @@ strategy:
   untrusted triggers (2026-06-26) — see [watchlist-2026.md](watchlist-2026.md).
 - Never cache secrets or credentials.
 
+## Step-level parallel execution
+
+GitHub introduced step-level parallel execution in public preview on
+2026-06-25 (`background`, `wait`, `wait-all`, `cancel`, and `parallel`). Treat it
+as a performance and ergonomics feature, not a default for canonical templates:
+
+- keep reusable workflows sequential unless parallelism materially reduces wall
+  clock time;
+- avoid shared mutable files between parallel steps;
+- document artifact/cache/log ordering assumptions before adopting it.
+
+The catalog entry is `step-level-parallel-execution`.
+
 ## Artifacts
 
 `actions/upload-artifact` / `download-artifact` move files between jobs and

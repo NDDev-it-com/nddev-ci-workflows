@@ -39,6 +39,20 @@ Key points:
   because of platform multipliers. The private-free tier keeps matrices to Linux
   where possible (see [02 Private free](02-private-free.md)).
 
+## July 2026 runner governance updates
+
+GitHub added more hosted-runner governance controls on 2026-06-25:
+
+- admins can disable standard hosted-runner labels such as `ubuntu-latest`;
+- macOS runners can be placed in runner groups with repository/workflow access
+  controls;
+- runner groups can enforce concurrency and routing policy.
+
+RHEL 9 and RHEL 10 images for Linux x64 larger runners are also in public
+preview. They are useful for enterprise compatibility testing, but they remain
+larger-runner capacity and therefore metered. The catalog entries are
+`hosted-runner-governance-controls` and `rhel-larger-runner-images`.
+
 ## harden-runner egress control
 
 `step-security/harden-runner` monitors and optionally restricts network egress

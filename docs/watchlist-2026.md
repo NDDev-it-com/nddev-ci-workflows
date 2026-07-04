@@ -21,6 +21,26 @@ poisoning across the trust boundary. **Status:** rolled out. **Date:**
 2026-06-26. See [security/pull-request-target.md](security/pull-request-target.md)
 and [04 Actions core](04-actions-core.md#cache).
 
+## Step-level parallel execution
+
+Actions added `background`, `wait`, `wait-all`, `cancel`, and `parallel` step
+syntax in public preview on 2026-06-25. Keep canonical workflows sequential
+unless parallelism has a clear benefit and shared state is explicitly isolated.
+
+## Hosted-runner governance and RHEL larger runners
+
+GitHub added hosted-runner governance controls on 2026-06-25 (disable standard
+labels, place macOS runners in runner groups, enforce concurrency/routing).
+RHEL 9/10 images for Linux x64 larger runners are also in public preview.
+Document as paid/preview enterprise surfaces, not public-free defaults.
+
+## License compliance preview
+
+Open source license compliance entered public preview on 2026-06-30 for
+Enterprise Cloud customers with GitHub Advanced Security Code Security. Treat it
+as a ruleset-backed private-paid governance capability and pilot in evaluate
+mode before blocking merges.
+
 ## GitHub Models retirement
 
 **GitHub Models is fully retired on 2026-07-30** (brownouts 07-16 and 07-23). Do

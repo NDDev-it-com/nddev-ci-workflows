@@ -13,7 +13,7 @@ deprecations:
       Fully retired 2026-07-30 with brownouts on 2026-07-16 and 2026-07-23.
       Do not build CI around the 'models: read' permission.
     sources:
-      - "https://docs.github.com/en/github-models"
+      - "https://github.blog/changelog/2026-07-01-github-models-is-being-fully-retired-on-july-30-2026/"
 
   - id: branch-protection-classic
     name: Branch protection (classic)

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-07-04
+
+### Added
+
+- `public-dependency-review.yml` now exposes `vulnerability_check` and
+  `allow_licenses`, preserving stricter adapter-local Dependency Review
+  semantics during migration to reusable workflows.
+
 ## [0.2.1] - 2026-07-04
 
 ### Added

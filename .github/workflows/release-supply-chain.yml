@@ -1,8 +1,19 @@
 name: release-supply-chain
 
-# Reusable release supply-chain hardening for BOTH tiers: deterministic archive,
-# SPDX SBOM, SHA256SUMS, SLSA build provenance attestations, and GitHub Release
-# publication. The caller triggers on a numeric tag and passes the version.
+# Reusable release supply-chain hardening for BOTH tiers.
+#
+# Produces, for a numeric tag, a deterministic archive, a real SPDX SBOM
+# (anchore/sbom-action / Syft), a release manifest, SHA256SUMS, and TWO signed
+# attestations: SLSA build provenance for the archive and an SBOM attestation.
+# It then publishes ONE immutable GitHub Release with every asset attached in a
+# single create call.
+#
+# SLSA note: build provenance generated from inside this reusable workflow meets
+# SLSA v1.0 Build Level 3 (build logic is isolated from the caller).
+#
+# Immutable releases (GA 2025-10-28): assets on a published release cannot be
+# modified, deleted, or clobbered. This workflow therefore fails fast if the
+# release already exists and never uses `gh release upload --clobber`.
 
 on:
   workflow_call:
@@ -25,6 +36,10 @@ on:
         description: 'Optional path to release notes; extracted from CHANGELOG if empty.'
         type: string
         default: ''
+      sbom_source_path:
+        description: 'Filesystem path Syft scans to build the SBOM.'
+        type: string
+        default: '.'
 
 permissions: {}
 
@@ -34,9 +49,9 @@ jobs:
     runs-on: ${{ inputs.runner }}
     timeout-minutes: 30
     permissions:
-      contents: write
-      id-token: write
-      attestations: write
+      contents: write        # create the GitHub Release
+      id-token: write        # OIDC token for Sigstore signing
+      attestations: write    # persist build-provenance + SBOM attestations
     env:
       RELEASE_VERSION: ${{ inputs.version }}
       PACKAGE_NAME: ${{ inputs.package_name }}
@@ -69,10 +84,31 @@ jobs:
             fi
           fi
 
-      - name: Build deterministic archive, SBOM, and checksums
+      - name: Preflight — refuse to modify an existing (immutable) release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
+            echo "Release '$RELEASE_VERSION' already exists." >&2
+            echo "Immutable releases cannot be modified; bump the version instead." >&2
+            exit 1
+          fi
+          echo "No existing release for '$RELEASE_VERSION'; proceeding."
+
+      - name: Generate SPDX SBOM (Syft)
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610  # v0.24.0
+        with:
+          path: ${{ inputs.sbom_source_path }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+
+      - name: Build deterministic archive, manifest, and checksums
         run: |
           set -euo pipefail
           mkdir -p dist
+          mv sbom.spdx.json dist/sbom.spdx.json
           archive="dist/${PACKAGE_NAME}-${RELEASE_VERSION}.tar.gz"
           # shellcheck disable=SC2086
           tar --sort=name \
@@ -82,58 +118,49 @@ jobs:
             -cf - $ARCHIVE_PATHS | gzip -n > "$archive"
 
           python3 - <<'PY'
-          import os, json
+          import os, json, subprocess
           from pathlib import Path
           v = os.environ["RELEASE_VERSION"]; name = os.environ["PACKAGE_NAME"]
           archive = f"{name}-{v}.tar.gz"
-          created = None
           try:
-              import subprocess
-              created = subprocess.check_output(["git", "log", "-1", "--format=%cI"], text=True).strip()
+              created = subprocess.check_output(
+                  ["git", "log", "-1", "--format=%cI"], text=True).strip()
           except Exception:
               created = "1970-01-01T00:00:00Z"
           manifest = {
               "package_name": name,
               "version": v,
               "source_commit_time": created,
-              "required_artifacts": [archive, "sbom.spdx.json", "release-manifest.json", "SHA256SUMS"],
+              "slsa_build_level": 3,
+              "required_artifacts": [
+                  archive, "sbom.spdx.json", "release-manifest.json", "SHA256SUMS",
+              ],
           }
-          Path("dist/release-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-          sbom = {
-              "spdxVersion": "SPDX-2.3",
-              "SPDXID": "SPDXRef-DOCUMENT",
-              "name": name,
-              "packages": [{
-                  "SPDXID": f"SPDXRef-Package-{name}",
-                  "name": name,
-                  "versionInfo": v,
-                  "downloadLocation": f"git+https://github.com/{os.environ.get('GITHUB_REPOSITORY','')}.git",
-              }],
-              "creationInfo": {"created": created, "creators": ["Tool: nddev-ci-workflows release-supply-chain"]},
-          }
-          Path("dist/sbom.spdx.json").write_text(json.dumps(sbom, indent=2) + "\n", encoding="utf-8")
+          Path("dist/release-manifest.json").write_text(
+              json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
           PY
 
           ( cd dist && sha256sum ./* > SHA256SUMS )
 
-      - name: Attest release archive
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
+      - name: Attest build provenance (archive)
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373  # v4.1.1
         with:
           subject-path: dist/${{ inputs.package_name }}-${{ inputs.version }}.tar.gz
 
-      - name: Attest SPDX SBOM
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
+      - name: Attest SBOM (archive)
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e  # v4.1.0
         with:
-          subject-path: dist/sbom.spdx.json
+          subject-path: dist/${{ inputs.package_name }}-${{ inputs.version }}.tar.gz
+          sbom-path: dist/sbom.spdx.json
 
-      - name: Upload release artifacts
+      - name: Upload workflow artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: release-${{ inputs.version }}
           path: dist
           retention-days: 30
 
-      - name: Publish GitHub Release
+      - name: Publish immutable GitHub Release (single create)
         env:
           GH_TOKEN: ${{ github.token }}
           NOTES_FILE: ${{ inputs.notes_file }}
@@ -147,12 +174,10 @@ jobs:
             ' CHANGELOG.md > dist/release-notes.md || true
             NOTES_FILE=dist/release-notes.md
           fi
-          if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_VERSION" dist/* --clobber
-          else
-            gh release create "$RELEASE_VERSION" \
-              --verify-tag \
-              --title "$RELEASE_VERSION" \
-              ${NOTES_FILE:+--notes-file "$NOTES_FILE"} \
-              dist/*
-          fi
+          # Single create call: every asset is attached at publish time, which is
+          # the immutable-release-compatible pattern (no post-publish clobber).
+          gh release create "$RELEASE_VERSION" \
+            --verify-tag \
+            --title "$RELEASE_VERSION" \
+            ${NOTES_FILE:+--notes-file "$NOTES_FILE"} \
+            dist/*

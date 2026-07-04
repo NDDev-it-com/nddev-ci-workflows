@@ -1,0 +1,182 @@
+# External tools referenced by nddev-ci-workflows.
+# Machine-readable source of truth. Mirrored by docs/. Enforced by scripts/validate_catalog.py.
+# Action `pin` values are full commit SHAs (tags are mutable); CLIs pin by version/checksum and use null here.
+# Last verified: 2026-07-04
+
+tools:
+  - id: actionlint
+    name: actionlint
+    homepage: "https://github.com/rhysd/actionlint"
+    kind: cli
+    current_version: "1.7.12"
+    pin: null
+    used_by:
+      - .github/workflows/actionlint.yml
+    last_verified: "2026-07-04"
+
+  - id: zizmor
+    name: zizmor
+    homepage: "https://github.com/woodruffw/zizmor"
+    kind: cli
+    current_version: "1.26.1"
+    pin: null
+    used_by:
+      - .github/workflows/zizmor-sarif.yml
+      - .github/workflows/zizmor-no-sarif.yml
+    last_verified: "2026-07-04"
+
+  - id: gitleaks
+    name: gitleaks
+    homepage: "https://github.com/gitleaks/gitleaks"
+    kind: container
+    current_version: "v8.30.1"
+    pin: "zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f"
+    used_by:
+      - .github/workflows/secret-scan.yml
+    last_verified: "2026-07-04"
+
+  - id: trivy
+    name: Trivy
+    homepage: "https://github.com/aquasecurity/trivy"
+    kind: cli
+    current_version: "v0.72.0"
+    pin: null
+    used_by:
+      - .github/workflows/container-ci.yml
+    last_verified: "2026-07-04"
+
+  - id: syft
+    name: Syft
+    homepage: "https://github.com/anchore/syft"
+    kind: cli
+    current_version: "v1.46.0"
+    pin: null
+    used_by:
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"
+
+  - id: anchore-sbom-action
+    name: anchore/sbom-action
+    homepage: "https://github.com/anchore/sbom-action"
+    kind: action
+    current_version: "v0.24.0"
+    pin: "anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610"
+    used_by:
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"
+
+  - id: harden-runner
+    name: step-security/harden-runner
+    homepage: "https://github.com/step-security/harden-runner"
+    kind: action
+    current_version: "v2.19.4"
+    pin: "step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411"
+    used_by:
+      - .github/workflows/public-codeql.yml
+      - .github/workflows/secret-scan.yml
+      - .github/workflows/actionlint.yml
+      - .github/workflows/zizmor-sarif.yml
+      - .github/workflows/zizmor-no-sarif.yml
+      - .github/workflows/cross-platform-smoke.yml
+    last_verified: "2026-07-04"
+
+  - id: codeql-action
+    name: github/codeql-action
+    homepage: "https://github.com/github/codeql-action"
+    kind: action
+    current_version: "v4.36.3"
+    pin: "github/codeql-action@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a"
+    used_by:
+      - .github/workflows/public-codeql.yml
+    last_verified: "2026-07-04"
+
+  - id: dependency-review-action
+    name: actions/dependency-review-action
+    homepage: "https://github.com/actions/dependency-review-action"
+    kind: action
+    current_version: "v5.0.0"
+    pin: "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294"
+    used_by:
+      - .github/workflows/public-dependency-review.yml
+    last_verified: "2026-07-04"
+
+  - id: scorecard-action
+    name: ossf/scorecard-action
+    homepage: "https://github.com/ossf/scorecard-action"
+    kind: action
+    current_version: "v2.4.3"
+    pin: "ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a"
+    used_by:
+      - .github/workflows/public-scorecard.yml
+    last_verified: "2026-07-04"
+
+  - id: attest
+    name: actions/attest
+    homepage: "https://github.com/actions/attest"
+    kind: action
+    current_version: "v4.1.1"
+    pin: "actions/attest@a1948c3f048ba23858d222213b7c278aabede763"
+    used_by:
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"
+
+  - id: attest-sbom
+    name: actions/attest-sbom
+    homepage: "https://github.com/actions/attest-sbom"
+    kind: action
+    current_version: "v4.1.0"
+    pin: "actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e"
+    used_by:
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"
+
+  - id: attest-build-provenance
+    name: actions/attest-build-provenance
+    homepage: "https://github.com/actions/attest-build-provenance"
+    kind: action
+    current_version: "v4.1.1"
+    pin: "actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1"
+    used_by:
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"
+
+  - id: checkout
+    name: actions/checkout
+    homepage: "https://github.com/actions/checkout"
+    kind: action
+    current_version: "v7.0.0"
+    pin: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+    used_by:
+      - .github/workflows/public-codeql.yml
+      - .github/workflows/public-dependency-review.yml
+      - .github/workflows/secret-scan.yml
+      - .github/workflows/actionlint.yml
+      - .github/workflows/zizmor-sarif.yml
+      - .github/workflows/zizmor-no-sarif.yml
+      - .github/workflows/cross-platform-smoke.yml
+      - .github/workflows/private-static.yml
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"
+
+  - id: setup-python
+    name: actions/setup-python
+    homepage: "https://github.com/actions/setup-python"
+    kind: action
+    current_version: "v6.3.0"
+    pin: "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1"
+    used_by:
+      - .github/workflows/zizmor-sarif.yml
+      - .github/workflows/zizmor-no-sarif.yml
+      - .github/workflows/cross-platform-smoke.yml
+      - .github/workflows/private-static.yml
+    last_verified: "2026-07-04"
+
+  - id: upload-artifact
+    name: actions/upload-artifact
+    homepage: "https://github.com/actions/upload-artifact"
+    kind: action
+    current_version: "v7.0.1"
+    pin: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+    used_by:
+      - .github/workflows/release-supply-chain.yml
+    last_verified: "2026-07-04"

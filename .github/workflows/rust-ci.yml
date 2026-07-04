@@ -1,0 +1,83 @@
+name: rust-ci
+
+# Reusable Rust CI for BOTH tiers: harden-runner, pinned Rust toolchain (with
+# built-in cargo cache), and caller-provided build/test commands passed via env.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      toolchain:
+        type: string
+        default: 'stable'
+      components:
+        description: 'Comma-separated rustup components, e.g. clippy,rustfmt.'
+        type: string
+        default: 'clippy,rustfmt'
+      working_directory:
+        type: string
+        default: '.'
+      build_command:
+        description: 'Build command (bash). Empty to skip.'
+        type: string
+        default: 'cargo build --locked --all-targets'
+      test_command:
+        description: 'Test/verify command (bash).'
+        type: string
+        default: 'cargo test --locked'
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 30
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  rust:
+    name: rust (${{ inputs.toolchain }})
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659  # v1.17.0
+        with:
+          toolchain: ${{ inputs.toolchain }}
+          components: ${{ inputs.components }}
+
+      - name: Build
+        if: ${{ inputs.build_command != '' }}
+        env:
+          BUILD_COMMAND: ${{ inputs.build_command }}
+        run: bash -c "$BUILD_COMMAND"
+
+      - name: Run tests
+        env:
+          TEST_COMMAND: ${{ inputs.test_command }}
+          RUST_TOOLCHAIN: ${{ inputs.toolchain }}
+        run: |
+          bash -c "$TEST_COMMAND"
+          echo "Rust ${RUST_TOOLCHAIN} build + tests passed." >> "$GITHUB_STEP_SUMMARY"

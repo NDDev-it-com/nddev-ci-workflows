@@ -1,0 +1,81 @@
+name: docs-ci
+
+# Reusable docs CI for BOTH tiers. Dependency-free: checks Markdown for broken
+# relative links (a common docs rot) and runs an optional caller command for
+# heavier linting. No third-party linter is pulled in by default.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      docs_glob:
+        description: 'Glob of Markdown files to check.'
+        type: string
+        default: '**/*.md'
+      command:
+        description: 'Optional extra docs command (bash). Runs after link check.'
+        type: string
+        default: ''
+      enable_harden_runner:
+        type: boolean
+        default: true
+
+permissions: {}
+
+jobs:
+  docs:
+    name: docs link check
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Check relative Markdown links
+        env:
+          DOCS_GLOB: ${{ inputs.docs_glob }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, re, sys, glob
+          from pathlib import Path
+          pattern = os.environ["DOCS_GLOB"]
+          link_re = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
+          broken = []
+          for md in glob.glob(pattern, recursive=True):
+              base = Path(md).parent
+              text = Path(md).read_text(encoding="utf-8")
+              for target in link_re.findall(text):
+                  t = target.strip()
+                  if t.startswith(("http://", "https://", "#", "mailto:")):
+                      continue
+                  t = t.split("#", 1)[0].split("?", 1)[0]
+                  if not t:
+                      continue
+                  if not (base / t).exists():
+                      broken.append(f"{md}: broken relative link -> {target}")
+          if broken:
+              print("Broken relative links:")
+              for b in broken:
+                  print(f"  - {b}")
+              sys.exit(1)
+          print("All relative Markdown links resolve.")
+          PY
+
+      - name: Run extra docs command
+        if: ${{ inputs.command != '' }}
+        env:
+          DOCS_COMMAND: ${{ inputs.command }}
+        run: bash -c "$DOCS_COMMAND"

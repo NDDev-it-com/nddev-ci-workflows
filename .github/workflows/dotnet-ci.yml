@@ -1,0 +1,85 @@
+name: dotnet-ci
+
+# Reusable .NET CI for BOTH tiers: harden-runner, pinned setup-dotnet, and
+# caller-provided restore/build/test commands passed via env.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      dotnet_version:
+        type: string
+        default: '9.0.x'
+      working_directory:
+        type: string
+        default: '.'
+      restore_command:
+        type: string
+        default: 'dotnet restore'
+      build_command:
+        type: string
+        default: 'dotnet build --no-restore --configuration Release'
+      test_command:
+        type: string
+        default: 'dotnet test --no-build --configuration Release'
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 30
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  dotnet:
+    name: dotnet (${{ inputs.dotnet_version }})
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1  # v5.4.0
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      - name: Restore
+        if: ${{ inputs.restore_command != '' }}
+        env:
+          RESTORE_COMMAND: ${{ inputs.restore_command }}
+        run: bash -c "$RESTORE_COMMAND"
+
+      - name: Build
+        if: ${{ inputs.build_command != '' }}
+        env:
+          BUILD_COMMAND: ${{ inputs.build_command }}
+        run: bash -c "$BUILD_COMMAND"
+
+      - name: Test
+        env:
+          TEST_COMMAND: ${{ inputs.test_command }}
+          DOTNET_VER: ${{ inputs.dotnet_version }}
+        run: |
+          bash -c "$TEST_COMMAND"
+          echo ".NET ${DOTNET_VER} build + tests passed." >> "$GITHUB_STEP_SUMMARY"

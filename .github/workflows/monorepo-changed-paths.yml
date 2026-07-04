@@ -1,0 +1,89 @@
+name: monorepo-changed-paths
+
+# Reusable monorepo change router for BOTH tiers.
+# Computes which caller-defined path groups changed (pure git; no third-party
+# action) and exposes them as a JSON object output, so downstream jobs can gate
+# themselves with `if: fromJSON(needs.changes.outputs.result).<group>`.
+
+on:
+  workflow_call:
+    inputs:
+      filters:
+        description: >-
+          JSON object mapping group name -> array of prefix globs, e.g.
+          {"api":["services/api/"],"web":["apps/web/"]}.
+        type: string
+        required: true
+      base_ref:
+        description: 'Base ref to diff against (defaults to the PR base / previous push).'
+        type: string
+        default: ''
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+    outputs:
+      result:
+        description: 'JSON object of group -> bool (did that group change).'
+        value: ${{ jobs.changes.outputs.result }}
+
+permissions: {}
+
+jobs:
+  changes:
+    name: detect changed paths
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      result: ${{ steps.detect.outputs.result }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect changed groups
+        id: detect
+        env:
+          FILTERS: ${{ inputs.filters }}
+          BASE_REF: ${{ inputs.base_ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BASE_REF" ]; then
+            base="$BASE_REF"
+          elif [ "$EVENT_NAME" = "pull_request" ] || [ "$EVENT_NAME" = "pull_request_target" ]; then
+            base="$PR_BASE_SHA"
+          elif [ -n "${PUSH_BEFORE:-}" ] && git cat-file -e "${PUSH_BEFORE}^{commit}" 2>/dev/null; then
+            base="$PUSH_BEFORE"
+          else
+            base="$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)"
+          fi
+          echo "diffing against base: $base"
+          git diff --name-only "$base" HEAD > /tmp/changed.txt || true
+
+          python3 - <<'PY' > /tmp/result.json
+          import json, os
+          filters = json.loads(os.environ["FILTERS"])
+          with open("/tmp/changed.txt", encoding="utf-8") as fh:
+              changed = [ln.strip() for ln in fh if ln.strip()]
+          result = {}
+          for group, prefixes in filters.items():
+              result[group] = any(
+                  c.startswith(pfx.rstrip("*")) for c in changed for pfx in prefixes
+              )
+          print(json.dumps(result))
+          PY
+
+          result="$(cat /tmp/result.json)"
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Changed path groups"
+            echo '```json'
+            cat /tmp/result.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

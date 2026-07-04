@@ -1,0 +1,88 @@
+name: python-ci
+
+# Reusable Python CI for BOTH tiers: harden-runner, pinned setup-python with
+# optional dependency cache, and caller-provided install/test commands passed
+# via env (no `${{ inputs.* }}` inline in run:).
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      python_version:
+        type: string
+        default: '3.13'
+      working_directory:
+        type: string
+        default: '.'
+      cache:
+        description: 'setup-python cache: pip, poetry, pipenv, or empty to disable.'
+        type: string
+        default: ''
+      cache_dependency_path:
+        type: string
+        default: ''
+      install_command:
+        description: 'Dependency install command (bash). Empty to skip.'
+        type: string
+        default: 'python -m pip install --upgrade pip'
+      test_command:
+        description: 'Test/verify command (bash).'
+        type: string
+        required: true
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 20
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  python:
+    name: python (${{ inputs.python_version }})
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: ${{ inputs.python_version }}
+          cache: ${{ inputs.cache }}
+          cache-dependency-path: ${{ inputs.cache_dependency_path }}
+
+      - name: Install dependencies
+        if: ${{ inputs.install_command != '' }}
+        env:
+          INSTALL_COMMAND: ${{ inputs.install_command }}
+        run: bash -c "$INSTALL_COMMAND"
+
+      - name: Run tests
+        env:
+          TEST_COMMAND: ${{ inputs.test_command }}
+          PY_VERSION: ${{ inputs.python_version }}
+        run: |
+          bash -c "$TEST_COMMAND"
+          echo "Python ${PY_VERSION} tests passed." >> "$GITHUB_STEP_SUMMARY"

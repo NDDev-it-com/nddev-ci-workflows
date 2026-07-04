@@ -1,0 +1,78 @@
+name: go-ci
+
+# Reusable Go CI for BOTH tiers: harden-runner, pinned setup-go (built-in module
+# and build cache), and caller-provided build/test commands passed via env.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      go_version:
+        type: string
+        default: '1.24'
+      working_directory:
+        type: string
+        default: '.'
+      build_command:
+        description: 'Build command (bash). Empty to skip.'
+        type: string
+        default: 'go build ./...'
+      test_command:
+        description: 'Test/verify command (bash).'
+        type: string
+        default: 'go test ./...'
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 20
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  go:
+    name: go (${{ inputs.go_version }})
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16  # v6.5.0
+        with:
+          go-version: ${{ inputs.go_version }}
+
+      - name: Build
+        if: ${{ inputs.build_command != '' }}
+        env:
+          BUILD_COMMAND: ${{ inputs.build_command }}
+        run: bash -c "$BUILD_COMMAND"
+
+      - name: Run tests
+        env:
+          TEST_COMMAND: ${{ inputs.test_command }}
+          GO_VER: ${{ inputs.go_version }}
+        run: |
+          bash -c "$TEST_COMMAND"
+          echo "Go ${GO_VER} build + tests passed." >> "$GITHUB_STEP_SUMMARY"

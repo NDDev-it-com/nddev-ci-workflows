@@ -50,6 +50,8 @@ jobs:
           exit "$rc"
 
   actionlint:
+    permissions:
+      contents: read
     uses: ./.github/workflows/actionlint.yml
 
   zizmor:

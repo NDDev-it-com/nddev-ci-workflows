@@ -28,6 +28,7 @@
 | Terraform CI (`terraform-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/terraform-ci.yml` | `-` |
 | HTML/CSS/web CI (`web-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/web-ci.yml` | `examples/languages/web.yml` |
 | GitHub Agentic Workflows (`agentic-workflows`) | ai-agentic | preview | conditional | conditional | conditional | `-` | `-` |
+| AI code review (`ai-code-review`) | ai-agentic | ga | conditional | conditional | conditional | `-` | `examples/level3/ai-review.yml` |
 | GitHub Models (`github-models`) | ai-agentic | retiring | conditional | conditional | conditional | `-` | `-` |
 | PR hygiene (commitlint, PR title, labeler, stale) (`pr-hygiene`) | community-dx | ga | free | free | available | `.github/workflows/pr-hygiene.yml` | `examples/quality/pr-hygiene.yml` |
 | OIDC cloud publishing (`oidc-cloud-publishing`) | deployments | ga | free | free | available | `-` | `-` |
@@ -40,6 +41,7 @@
 | Immutable releases (`immutable-releases`) | releases-packages | ga | free | free | available | `-` | `-` |
 | npm trusted publishing (`npm-trusted-publishing`) | releases-packages | ga | free | free | available | `-` | `examples/release/npm-trusted-publishing.yml` |
 | PyPI trusted publishing (`pypi-trusted-publishing`) | releases-packages | ga | free | free | available | `-` | `examples/release/pypi-trusted-publishing.yml` |
+| Release automation (release-please / changesets) (`release-automation`) | releases-packages | ga | free | free | available | `-` | `examples/level3/release-please.yml` |
 | Release supply chain (SBOM + attest + publish) (`release-supply-chain`) | releases-packages | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `examples/public-oss/release.yml` |
 | GitHub-hosted runner governance controls (`hosted-runner-governance-controls`) | runners | preview | conditional | conditional | conditional | `-` | `-` |
 | Larger and GPU hosted runners (`larger-gpu-runners`) | runners | ga | paid | unavailable | available | `-` | `-` |

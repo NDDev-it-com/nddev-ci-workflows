@@ -1369,3 +1369,48 @@ capabilities:
     sources:
       - "https://github.com/benchmark-action/github-action-benchmark"
       - "https://bencher.dev/"
+
+  - id: ai-code-review
+    name: AI code review
+    cluster: ai-agentic
+    status: ga
+    public_oss: conditional
+    private_free: conditional
+    private_paid: conditional
+    workflow: null
+    example: examples/level3/ai-review.yml
+    required_permissions:
+      - "contents: read"
+      - "pull-requests: write"
+    required_settings:
+      - "Model API key stored as a secret (e.g. ANTHROPIC_API_KEY), or a GitHub App (CodeRabbit)"
+    risks:
+      - "AI reviews are advisory; keep human review as the merge gate"
+      - "CodeRabbit is free for public OSS; Claude/Qodo consume paid model tokens"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/anthropics/claude-code-action"
+      - "https://github.com/qodo-ai/pr-agent"
+
+  - id: release-automation
+    name: Release automation (release-please / changesets)
+    cluster: releases-packages
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: null
+    example: examples/level3/release-please.yml
+    required_permissions:
+      - "contents: write"
+      - "pull-requests: write"
+    required_settings: []
+    risks:
+      - "Complements, not replaces, the tag-driven release-supply-chain workflow"
+      - "release-please opens a release PR; changesets suits monorepos with per-package versioning"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/googleapis/release-please-action"
+      - "https://github.com/changesets/action"

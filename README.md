@@ -46,6 +46,18 @@ The machine-readable source of truth is [`catalog/capabilities.yml`](catalog/cap
 Generated mirrors live in [`docs/generated/`](docs/generated/) and are checked by
 `scripts/generate_docs.py --check`.
 
+### Extended packs (July 2026)
+
+Beyond the security suite, the library ships language packs (Python, Node, Go,
+Rust, Java, .NET, **Dart/Flutter, C/C++, Qt, Kotlin/Android, Swift, R, HTML/CSS,
+SQL**), quality gates (coverage, docs-quality, PR-hygiene), free SAST/SCA/IaC for
+every tier (Semgrep, OSV-Scanner, Grype, hadolint, Checkov — free even on
+private-free, where CodeQL and dependency review are paid), advanced testing
+(mutation, fuzzing, benchmark), and opt-in Level-3 patterns (AI code review,
+release-please). See
+[`docs/15-language-and-quality-packs.md`](docs/15-language-and-quality-packs.md)
+and copy-paste callers under [`examples/`](examples/).
+
 ## Usage
 
 Always pin by **full commit SHA** (tags are mutable). Dependabot bumps the SHA.
@@ -193,7 +205,7 @@ docs/generated/ catalog-derived matrices (do not edit by hand)
   rulesets/    branch/tag/push ruleset specs
   ISSUE_TEMPLATE/  issue forms
 scripts/    static validators (validate_all.py) + attestation verifier
-examples/   copy-paste caller workflows per tier
+examples/   copy-paste callers: per-tier + languages/ quality/ security/ testing/ level3/
 ```
 
 ## Conventions

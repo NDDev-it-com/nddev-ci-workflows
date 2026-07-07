@@ -1,0 +1,110 @@
+name: pr-hygiene
+
+# Reusable PR-hygiene bundle. Each check is an independently toggled job with
+# least-privilege permissions. Trigger from pull_request (commitlint, pr-title,
+# labeler) and/or schedule (stale). The caller must grant the union of the
+# enabled jobs' permissions. Every tool is free on every tier.
+
+on:
+  workflow_call:
+    inputs:
+      commitlint:
+        type: boolean
+        default: true
+      commitlint_config:
+        description: 'Path to a commitlint config. Empty uses the repository default.'
+        type: string
+        default: ''
+      pr_title:
+        type: boolean
+        default: true
+      labeler:
+        type: boolean
+        default: false
+      labeler_config:
+        type: string
+        default: '.github/labeler.yml'
+      stale:
+        type: boolean
+        default: false
+      days_before_stale:
+        type: number
+        default: 60
+      days_before_close:
+        type: number
+        default: 14
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 10
+
+permissions: {}
+
+jobs:
+  commitlint:
+    if: ${{ inputs.commitlint }}
+    name: commitlint
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: commitlint
+        uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed  # v6.2.1
+        with:
+          configFile: ${{ inputs.commitlint_config }}
+
+  pr-title:
+    if: ${{ inputs.pr_title }}
+    name: pr-title
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    steps:
+      - name: Validate PR title (Conventional Commits)
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50  # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  labeler:
+    if: ${{ inputs.labeler }}
+    name: labeler
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Label pull request
+        uses: actions/labeler@f27b608878404679385c85cfa523b85ccb86e213  # v6.1.0
+        with:
+          configuration-path: ${{ inputs.labeler_config }}
+
+  stale:
+    if: ${{ inputs.stale }}
+    name: stale
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Mark stale issues and pull requests
+        uses: actions/stale@eb5cf3af3ac0a1aa4c9c45633dd1ae542a27a899  # v10.3.0
+        with:
+          days-before-stale: ${{ inputs.days_before_stale }}
+          days-before-close: ${{ inputs.days_before_close }}

@@ -1,0 +1,19 @@
+# Coverage upload caller (any tier). Replace @<sha> with a pinned full commit SHA.
+# Public repos may upload tokenless; private repos need CODECOV_TOKEN.
+name: coverage
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: {}
+concurrency:
+  group: coverage-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  coverage:
+    permissions: { contents: read }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/coverage-gate.yml@<sha>
+    with:
+      coverage_command: 'pip install -e ".[test]" && pytest --cov --cov-report=xml'
+      files: coverage.xml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}

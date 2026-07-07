@@ -67,6 +67,13 @@ For end-to-end caller examples per tier, see the tier docs and the repository
 | `terraform-ci.yml` | Terraform fmt/validate/plan | Both |
 | `docs-ci.yml` | Docs lint/link-check/build | Both |
 | `monorepo-changed-paths.yml` | Changed-path filtering for monorepos | Both |
+| `dart-flutter-ci.yml` · `cpp-ci.yml` · `qt-ci.yml` · `kotlin-android-ci.yml` · `swift-ci.yml` · `r-ci.yml` · `web-ci.yml` · `sql-ci.yml` | Language packs (Dart/Flutter, C/C++, Qt, Kotlin/Android, Swift, R, web, SQL) | Both |
+| `coverage-gate.yml` · `docs-quality.yml` · `pr-hygiene.yml` | Coverage, docs quality, PR hygiene | Both |
+| `semgrep-ci.yml` · `osv-scan.yml` · `grype-scan.yml` · `hadolint-ci.yml` · `iac-scan.yml` | Free SAST/SCA/IaC (incl. private-free) | Both |
+| `mutation-testing.yml` · `fuzzing.yml` · `benchmark.yml` | Mutation testing, fuzzing, benchmark | Both |
+
+> The July 2026 language/quality/security/testing packs are documented in
+> [15 Language & quality packs](15-language-and-quality-packs.md).
 
 > zizmor is split into two callers: `zizmor-sarif.yml` (uploads to code
 > scanning, for public and GHAS) and `zizmor-no-sarif.yml` (fails the job on
@@ -87,10 +94,11 @@ For end-to-end caller examples per tier, see the tier docs and the repository
   [12 Community & DX](12-community-dx.md)
 - Tooling: [13 External tools](13-external-tools.md) ·
   [14 AI / agentic workflows](14-ai-agentic-workflows.md)
+- Packs: [15 Language & quality packs](15-language-and-quality-packs.md)
 - Horizon: [Watchlist 2026](watchlist-2026.md)
 - Security deep-dive: [pull_request_target / pwn requests](security/pull-request-target.md)
 - Generated from catalog: [capability matrix](generated/capability-matrix.md) ·
   [workflow inventory](generated/workflow-inventory.md)
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-08

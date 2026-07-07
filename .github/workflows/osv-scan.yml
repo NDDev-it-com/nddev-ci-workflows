@@ -1,0 +1,80 @@
+name: osv-scan
+
+# Reusable OSV-Scanner SCA for BOTH tiers. Free on private-free repos, where
+# GitHub dependency review is a paid GHAS feature. Pinned, checksum-verified
+# binary; gate-only: known vulnerabilities fail the job (no SARIF upload).
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      working_directory:
+        type: string
+        default: '.'
+      scan_args:
+        description: 'Arguments after "osv-scanner scan source", e.g. "--recursive ." or "--lockfile=path".'
+        type: string
+        default: '--recursive .'
+      osv_scanner_version:
+        type: string
+        default: '2.4.0'
+      osv_scanner_sha256:
+        description: 'SHA256 of osv-scanner_linux_amd64 from the release SHA256SUMS.'
+        type: string
+        default: '15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0'
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 15
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  osv-scan:
+    name: osv-scan
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Install OSV-Scanner (pinned + checksum-verified)
+        env:
+          OSV_VERSION: ${{ inputs.osv_scanner_version }}
+          OSV_SHA256: ${{ inputs.osv_scanner_sha256 }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/osv-scanner \
+            "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
+          echo "${OSV_SHA256}  /tmp/osv-scanner" | sha256sum -c -
+          install -m 0755 /tmp/osv-scanner /usr/local/bin/osv-scanner
+          osv-scanner --version
+
+      - name: OSV scan
+        env:
+          OSV_SCAN_ARGS: ${{ inputs.scan_args }}
+        run: |
+          # shellcheck disable=SC2086
+          osv-scanner scan source $OSV_SCAN_ARGS
+          echo "OSV-Scanner SCA passed." >> "$GITHUB_STEP_SUMMARY"

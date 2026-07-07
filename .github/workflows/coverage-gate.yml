@@ -1,0 +1,99 @@
+name: coverage-gate
+
+# Reusable coverage upload for BOTH tiers: harden-runner, a caller-provided
+# coverage command, and a Codecov upload (free on public; token-gated on
+# private) with an optional Coveralls upload. Coverage thresholds are enforced by
+# the caller's codecov.yml, not here.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      working_directory:
+        type: string
+        default: '.'
+      coverage_command:
+        description: 'Command (bash) that produces a coverage report. Empty to skip.'
+        type: string
+        default: ''
+      files:
+        description: 'Coverage file(s) to upload (comma-separated). Empty lets Codecov search.'
+        type: string
+        default: ''
+      flags:
+        type: string
+        default: ''
+      fail_ci_if_error:
+        type: boolean
+        default: true
+      use_codecov:
+        type: boolean
+        default: true
+      use_coveralls:
+        type: boolean
+        default: false
+      coveralls_file:
+        description: 'Coverage file for Coveralls, e.g. coverage/lcov.info.'
+        type: string
+        default: ''
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 20
+    secrets:
+      codecov_token:
+        required: false
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  coverage:
+    name: coverage
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Produce coverage
+        if: ${{ inputs.coverage_command != '' }}
+        env:
+          COVERAGE_COMMAND: ${{ inputs.coverage_command }}
+        run: bash -c "$COVERAGE_COMMAND"
+
+      - name: Upload to Codecov
+        if: ${{ inputs.use_codecov }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f  # v7.0.0
+        with:
+          token: ${{ secrets.codecov_token }}
+          files: ${{ inputs.files }}
+          flags: ${{ inputs.flags }}
+          fail_ci_if_error: ${{ inputs.fail_ci_if_error }}
+
+      - name: Upload to Coveralls
+        if: ${{ inputs.use_coveralls }}
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b  # v2.3.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ inputs.coveralls_file }}

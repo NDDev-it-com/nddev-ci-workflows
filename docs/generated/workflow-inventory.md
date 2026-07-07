@@ -4,28 +4,47 @@
 | Workflow | Capability IDs | Statuses |
 | --- | --- | --- |
 | `.github/workflows/actionlint.yml` | `actionlint` | ga |
+| `.github/workflows/benchmark.yml` | `benchmark` | ga |
 | `.github/workflows/ci.yml` | internal | internal |
 | `.github/workflows/container-ci.yml` | `container-scan-trivy` | ga |
+| `.github/workflows/coverage-gate.yml` | `coverage-gate` | ga |
+| `.github/workflows/cpp-ci.yml` | `cpp-ci` | ga |
 | `.github/workflows/cross-platform-smoke.yml` | `cross-platform-smoke` | ga |
+| `.github/workflows/dart-flutter-ci.yml` | `dart-flutter-ci` | ga |
 | `.github/workflows/docs-ci.yml` | `docs-ci` | ga |
+| `.github/workflows/docs-quality.yml` | `docs-quality` | ga |
 | `.github/workflows/dotnet-ci.yml` | `dotnet-ci` | ga |
+| `.github/workflows/fuzzing.yml` | `fuzzing` | ga |
 | `.github/workflows/go-ci.yml` | `go-ci` | ga |
+| `.github/workflows/grype-scan.yml` | `grype-sca` | ga |
+| `.github/workflows/hadolint-ci.yml` | `hadolint-dockerfile` | ga |
+| `.github/workflows/iac-scan.yml` | `iac-scan-checkov` | ga |
 | `.github/workflows/java-ci.yml` | `java-ci` | ga |
+| `.github/workflows/kotlin-android-ci.yml` | `kotlin-android-ci` | ga |
 | `.github/workflows/monorepo-changed-paths.yml` | `monorepo-changed-paths` | ga |
+| `.github/workflows/mutation-testing.yml` | `mutation-testing` | ga |
 | `.github/workflows/node-ci.yml` | `node-ci` | ga |
+| `.github/workflows/osv-scan.yml` | `osv-scanner-sca` | ga |
+| `.github/workflows/pr-hygiene.yml` | `pr-hygiene` | ga |
 | `.github/workflows/private-static.yml` | `private-static-validation` | ga |
 | `.github/workflows/public-codeql.yml` | `codeql-code-scanning` | ga |
 | `.github/workflows/public-dependency-review.yml` | `dependency-review` | ga |
 | `.github/workflows/public-scorecard-json.yml` | `ossf-scorecard-json` | ga |
 | `.github/workflows/public-scorecard.yml` | `ossf-scorecard` | ga |
 | `.github/workflows/python-ci.yml` | `python-ci` | ga |
+| `.github/workflows/qt-ci.yml` | `qt-ci` | ga |
+| `.github/workflows/r-ci.yml` | `r-ci` | ga |
 | `.github/workflows/release-supply-chain.yml` | `artifact-attestations`, `sbom-generation`, `slsa-build-provenance`, `release-supply-chain` | ga |
 | `.github/workflows/release.yml` | internal | internal |
 | `.github/workflows/rust-ci.yml` | `rust-ci` | ga |
 | `.github/workflows/secret-scan.yml` | `gitleaks-secret-scan` | ga |
+| `.github/workflows/semgrep-ci.yml` | `semgrep-sast` | ga |
+| `.github/workflows/sql-ci.yml` | `sql-ci` | ga |
+| `.github/workflows/swift-ci.yml` | `swift-ci` | ga |
 | `.github/workflows/terraform-ci.yml` | `terraform-ci` | ga |
+| `.github/workflows/web-ci.yml` | `web-ci` | ga |
 | `.github/workflows/zizmor-no-sarif.yml` | `zizmor-no-sarif` | ga |
 | `.github/workflows/zizmor-sarif.yml` | `zizmor` | ga |
 
 ---
-Last generated: 2026-07-04
+Last generated: 2026-07-08

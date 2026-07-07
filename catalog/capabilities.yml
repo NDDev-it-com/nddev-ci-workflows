@@ -243,7 +243,7 @@ capabilities:
     private_free: free
     private_paid: available
     workflow: .github/workflows/cross-platform-smoke.yml
-    example: null
+    example: examples/infra/cross-platform.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -782,7 +782,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/python-ci.yml
-    example: null
+    example: examples/languages/python.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -802,7 +802,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/node-ci.yml
-    example: null
+    example: examples/languages/node.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -821,7 +821,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/go-ci.yml
-    example: null
+    example: examples/languages/go.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -840,7 +840,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/rust-ci.yml
-    example: null
+    example: examples/languages/rust.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -859,7 +859,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/java-ci.yml
-    example: null
+    example: examples/languages/java.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -878,7 +878,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/dotnet-ci.yml
-    example: null
+    example: examples/languages/dotnet.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -897,7 +897,7 @@ capabilities:
     private_free: free
     private_paid: available
     workflow: .github/workflows/container-ci.yml
-    example: null
+    example: examples/infra/container.yml
     required_permissions:
       - "contents: read"
       - "security-events: write"
@@ -920,7 +920,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/terraform-ci.yml
-    example: null
+    example: examples/infra/terraform.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -940,7 +940,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/docs-ci.yml
-    example: null
+    example: examples/infra/docs.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -959,7 +959,7 @@ capabilities:
     private_free: conditional
     private_paid: available
     workflow: .github/workflows/monorepo-changed-paths.yml
-    example: null
+    example: examples/infra/monorepo.yml
     required_permissions:
       - "contents: read"
     required_settings: []
@@ -970,3 +970,447 @@ capabilities:
     last_verified: "2026-07-04"
     sources:
       - "https://docs.github.com/en/actions/using-workflows/reusing-workflows"
+
+  - id: dart-flutter-ci
+    name: Dart/Flutter CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/dart-flutter-ci.yml
+    example: examples/languages/dart-flutter.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+      - "iOS/macOS builds require macOS runners billed at a 10x minute multiplier"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://docs.flutter.dev/deployment/cd"
+      - "https://github.com/subosito/flutter-action"
+
+  - id: web-ci
+    name: HTML/CSS/web CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/web-ci.yml
+    example: examples/languages/web.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Default lint uses npx to fetch stylelint/htmlhint at runtime; pin them in package.json for reproducible CI"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://stylelint.io/"
+      - "https://htmlhint.com/"
+
+  - id: sql-ci
+    name: SQL CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/sql-ci.yml
+    example: examples/languages/sql.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Pin sqlfluff_version for reproducible linting; the default installs the latest release"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://docs.sqlfluff.com/"
+      - "https://github.com/sqlfluff/sqlfluff"
+
+  - id: cpp-ci
+    name: C/C++ CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/cpp-ci.yml
+    example: examples/languages/cpp.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "clang-format/cppcheck are opt-in and require the tools present (add cppcheck to apt_packages)"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://cmake.org/cmake/help/latest/manual/ctest.1.html"
+      - "https://clang.llvm.org/docs/ClangFormat.html"
+
+  - id: qt-ci
+    name: Qt CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/qt-ci.yml
+    example: examples/languages/qt.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "aqtinstall downloads Qt at runtime; pin qt_version for reproducible builds"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/jurplel/install-qt-action"
+      - "https://doc.qt.io/qt-6/cmake-manual.html"
+
+  - id: kotlin-android-ci
+    name: Kotlin/Android CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/kotlin-android-ci.yml
+    example: examples/languages/kotlin-android.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "ktlint/detekt run as project-defined Gradle tasks supplied via lint_command"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/gradle/actions"
+      - "https://developer.android.com/build"
+
+  - id: swift-ci
+    name: Swift CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/swift-ci.yml
+    example: examples/languages/swift.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Defaults to a macOS runner billed at a 10x minute multiplier; SwiftLint runs on macOS only"
+      - "harden-runner only runs on the Linux leg (it is a Linux/paid feature)"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://www.swift.org/documentation/"
+      - "https://github.com/realm/SwiftLint"
+
+  - id: r-ci
+    name: R CI
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/r-ci.yml
+    example: examples/languages/r.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Package dependencies install via a caller-provided install_command"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/r-lib/actions"
+      - "https://lintr.r-lib.org/"
+
+  - id: coverage-gate
+    name: Coverage gate
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/coverage-gate.yml
+    example: examples/quality/coverage-gate.yml
+    required_permissions:
+      - "contents: read"
+    required_settings:
+      - "CODECOV_TOKEN secret (required for private repos)"
+    risks:
+      - "Coverage thresholds are enforced by the caller's codecov.yml, not this workflow"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://docs.codecov.com/docs"
+      - "https://github.com/codecov/codecov-action"
+
+  - id: docs-quality
+    name: Docs quality (links, spelling, markdown)
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/docs-quality.yml
+    example: examples/quality/docs-quality.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Link checking hits the network; flaky external hosts can fail lychee (tune lychee_args)"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/lycheeverse/lychee-action"
+      - "https://github.com/crate-ci/typos"
+
+  - id: pr-hygiene
+    name: PR hygiene (commitlint, PR title, labeler, stale)
+    cluster: community-dx
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/pr-hygiene.yml
+    example: examples/quality/pr-hygiene.yml
+    required_permissions:
+      - "contents: read"
+      - "pull-requests: write (labeler and stale jobs)"
+      - "issues: write (stale job)"
+    required_settings: []
+    risks:
+      - "labeler on fork PRs needs pull_request_target, which this library intentionally avoids; use it for same-repo PRs"
+      - "Callers must grant the union of the enabled jobs' permissions"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/wagoid/commitlint-github-action"
+      - "https://github.com/actions/labeler"
+
+  - id: semgrep-sast
+    name: Semgrep OSS SAST
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/semgrep-ci.yml
+    example: examples/security/semgrep.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Gate-only (no SARIF); use CodeQL/GHAS for code-scanning alerts on paid tiers"
+      - "Registry rulesets (p/ci) are fetched at runtime; pin semgrep_version for reproducibility"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://semgrep.dev/docs/"
+      - "https://github.com/semgrep/semgrep"
+
+  - id: osv-scanner-sca
+    name: OSV-Scanner SCA
+    cluster: supply-chain
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/osv-scan.yml
+    example: examples/security/osv-scan.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Checksum-pinned binary; bump osv_scanner_version and osv_scanner_sha256 together"
+      - "Gate-only free alternative to GitHub dependency review on private-free repos"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://google.github.io/osv-scanner/"
+      - "https://github.com/google/osv-scanner"
+
+  - id: grype-sca
+    name: Grype vulnerability scan
+    cluster: supply-chain
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/grype-scan.yml
+    example: examples/security/grype-scan.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Gate-only (table output); wire SARIF + code scanning separately on paid tiers"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/anchore/grype"
+      - "https://github.com/anchore/scan-action"
+
+  - id: hadolint-dockerfile
+    name: hadolint Dockerfile lint
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/hadolint-ci.yml
+    example: examples/security/hadolint.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Tune failure_threshold and ignore to match your Dockerfile policy"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/hadolint/hadolint"
+      - "https://github.com/hadolint/hadolint-action"
+
+  - id: iac-scan-checkov
+    name: IaC scan (Checkov)
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/iac-scan.yml
+    example: examples/security/iac-scan.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Gate-only (CLI output); wire SARIF upload separately for code-scanning alerts"
+      - "Broadens Terraform-CI coverage to Kubernetes/CloudFormation/Helm/ARM"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://www.checkov.io/"
+      - "https://github.com/bridgecrewio/checkov-action"
+
+  - id: mutation-testing
+    name: Mutation testing
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/mutation-testing.yml
+    example: examples/testing/mutation-testing.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Mutation runs are slow; schedule them rather than gating every PR"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://mutmut.readthedocs.io/"
+      - "https://github.com/sourcefrog/cargo-mutants"
+
+  - id: fuzzing
+    name: Fuzzing
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/fuzzing.yml
+    example: examples/testing/fuzzing.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "cargo-fuzz needs a nightly toolchain; bound each run with -max_total_time"
+      - "For continuous coverage-guided fuzzing, integrate ClusterFuzzLite"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://rust-fuzz.github.io/book/cargo-fuzz.html"
+      - "https://google.github.io/clusterfuzzlite/"
+
+  - id: benchmark
+    name: Performance benchmark + regression alert
+    cluster: observability
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/benchmark.yml
+    example: examples/testing/benchmark.yml
+    required_permissions:
+      - "contents: write (gh-pages history when auto_push is true)"
+    required_settings: []
+    risks:
+      - "Storing history needs contents: write and a gh-pages branch; set auto_push false for compare-only runs"
+      - "Benchmark noise on shared runners can cause false regressions; tune alert_threshold"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/benchmark-action/github-action-benchmark"
+      - "https://bencher.dev/"
+
+  - id: ai-code-review
+    name: AI code review
+    cluster: ai-agentic
+    status: ga
+    public_oss: conditional
+    private_free: conditional
+    private_paid: conditional
+    workflow: null
+    example: examples/level3/ai-review.yml
+    required_permissions:
+      - "contents: read"
+      - "pull-requests: write"
+    required_settings:
+      - "Model API key stored as a secret (e.g. ANTHROPIC_API_KEY), or a GitHub App (CodeRabbit)"
+    risks:
+      - "AI reviews are advisory; keep human review as the merge gate"
+      - "CodeRabbit is free for public OSS; Claude/Qodo consume paid model tokens"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/anthropics/claude-code-action"
+      - "https://github.com/qodo-ai/pr-agent"
+
+  - id: release-automation
+    name: Release automation (release-please / changesets)
+    cluster: releases-packages
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: null
+    example: examples/level3/release-please.yml
+    required_permissions:
+      - "contents: write"
+      - "pull-requests: write"
+    required_settings: []
+    risks:
+      - "Complements, not replaces, the tag-driven release-supply-chain workflow"
+      - "release-please opens a release PR; changesets suits monorepos with per-package versioning"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/googleapis/release-please-action"
+      - "https://github.com/changesets/action"

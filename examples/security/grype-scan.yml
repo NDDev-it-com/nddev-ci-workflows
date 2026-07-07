@@ -1,0 +1,16 @@
+# Grype SCA caller (any tier — free on private-free). Replace @<sha>.
+# Private-free callers add `with: { enable_harden_runner: false }`.
+name: grype-scan
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: {}
+concurrency:
+  group: grype-scan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  grype:
+    permissions: { contents: read }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/grype-scan.yml@<sha>
+    with:
+      severity_cutoff: high

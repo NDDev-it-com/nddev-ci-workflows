@@ -181,3 +181,224 @@ tools:
     used_by:
       - .github/workflows/release-supply-chain.yml
     last_verified: "2026-07-04"
+
+  - id: flutter-action
+    name: subosito/flutter-action
+    homepage: "https://github.com/subosito/flutter-action"
+    kind: action
+    current_version: "v2.23.0"
+    pin: "subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2"
+    used_by:
+      - .github/workflows/dart-flutter-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: install-qt-action
+    name: jurplel/install-qt-action
+    homepage: "https://github.com/jurplel/install-qt-action"
+    kind: action
+    current_version: "v4.3.1"
+    pin: "jurplel/install-qt-action@48d3ad6db93f3627c8ee7a0454bc6f3744f7e730"
+    used_by:
+      - .github/workflows/qt-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: ccache-action
+    name: hendrikmuhs/ccache-action
+    homepage: "https://github.com/hendrikmuhs/ccache-action"
+    kind: action
+    current_version: "v1.2.23"
+    pin: "hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03"
+    used_by:
+      - .github/workflows/cpp-ci.yml
+      - .github/workflows/qt-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: setup-gradle
+    name: gradle/actions/setup-gradle
+    homepage: "https://github.com/gradle/actions"
+    kind: action
+    current_version: "v6.2.0"
+    pin: "gradle/actions@3f131e8634966bd73d06cc69884922b02e6faf92"
+    used_by:
+      - .github/workflows/kotlin-android-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: setup-android
+    name: android-actions/setup-android
+    homepage: "https://github.com/android-actions/setup-android"
+    kind: action
+    current_version: "v4.0.1"
+    pin: "android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699"
+    used_by:
+      - .github/workflows/kotlin-android-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: setup-swift
+    name: swift-actions/setup-swift
+    homepage: "https://github.com/swift-actions/setup-swift"
+    kind: action
+    current_version: "v2.4.0"
+    pin: "swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a"
+    used_by:
+      - .github/workflows/swift-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: setup-r
+    name: r-lib/actions/setup-r
+    homepage: "https://github.com/r-lib/actions"
+    kind: action
+    current_version: "v2"
+    pin: "r-lib/actions@d3c5be51b12e724e68f33216ca3c148b66d5f0b6"
+    used_by:
+      - .github/workflows/r-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: codecov-action
+    name: codecov/codecov-action
+    homepage: "https://github.com/codecov/codecov-action"
+    kind: action
+    current_version: "v7.0.0"
+    pin: "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f"
+    used_by:
+      - .github/workflows/coverage-gate.yml
+    last_verified: "2026-07-08"
+
+  - id: coveralls-action
+    name: coverallsapp/github-action
+    homepage: "https://github.com/coverallsapp/github-action"
+    kind: action
+    current_version: "v2.3.6"
+    pin: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+    used_by:
+      - .github/workflows/coverage-gate.yml
+    last_verified: "2026-07-08"
+
+  - id: lychee-action
+    name: lycheeverse/lychee-action
+    homepage: "https://github.com/lycheeverse/lychee-action"
+    kind: action
+    current_version: "v2.8.0"
+    pin: "lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411"
+    used_by:
+      - .github/workflows/docs-quality.yml
+    last_verified: "2026-07-08"
+
+  - id: typos-action
+    name: crate-ci/typos
+    homepage: "https://github.com/crate-ci/typos"
+    kind: action
+    current_version: "v1.48.0"
+    pin: "crate-ci/typos@bee27e3a4fd1ea2111cf90ab89cd076c870fce14"
+    used_by:
+      - .github/workflows/docs-quality.yml
+    last_verified: "2026-07-08"
+
+  - id: markdownlint-cli2-action
+    name: DavidAnson/markdownlint-cli2-action
+    homepage: "https://github.com/DavidAnson/markdownlint-cli2-action"
+    kind: action
+    current_version: "v24.0.0"
+    pin: "DavidAnson/markdownlint-cli2-action@8de2aa07cae85fd17c0b35642db70cf5495f1d25"
+    used_by:
+      - .github/workflows/docs-quality.yml
+    last_verified: "2026-07-08"
+
+  - id: commitlint-action
+    name: wagoid/commitlint-github-action
+    homepage: "https://github.com/wagoid/commitlint-github-action"
+    kind: action
+    current_version: "v6.2.1"
+    pin: "wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: semantic-pull-request
+    name: amannn/action-semantic-pull-request
+    homepage: "https://github.com/amannn/action-semantic-pull-request"
+    kind: action
+    current_version: "v6.1.1"
+    pin: "amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: labeler
+    name: actions/labeler
+    homepage: "https://github.com/actions/labeler"
+    kind: action
+    current_version: "v6.1.0"
+    pin: "actions/labeler@f27b608878404679385c85cfa523b85ccb86e213"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: stale
+    name: actions/stale
+    homepage: "https://github.com/actions/stale"
+    kind: action
+    current_version: "v10.3.0"
+    pin: "actions/stale@eb5cf3af3ac0a1aa4c9c45633dd1ae542a27a899"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: osv-scanner
+    name: osv-scanner
+    homepage: "https://github.com/google/osv-scanner"
+    kind: cli
+    current_version: "v2.4.0"
+    pin: null
+    used_by:
+      - .github/workflows/osv-scan.yml
+    last_verified: "2026-07-08"
+
+  - id: semgrep
+    name: semgrep
+    homepage: "https://github.com/semgrep/semgrep"
+    kind: cli
+    current_version: "v1.168.0"
+    pin: null
+    used_by:
+      - .github/workflows/semgrep-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: anchore-scan-action
+    name: anchore/scan-action
+    homepage: "https://github.com/anchore/scan-action"
+    kind: action
+    current_version: "v7.4.0"
+    pin: "anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2"
+    used_by:
+      - .github/workflows/grype-scan.yml
+    last_verified: "2026-07-08"
+
+  - id: hadolint-action
+    name: hadolint/hadolint-action
+    homepage: "https://github.com/hadolint/hadolint-action"
+    kind: action
+    current_version: "v3.3.0"
+    pin: "hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5"
+    used_by:
+      - .github/workflows/hadolint-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: checkov-action
+    name: bridgecrewio/checkov-action
+    homepage: "https://github.com/bridgecrewio/checkov-action"
+    kind: action
+    current_version: "v12.1347.0"
+    pin: "bridgecrewio/checkov-action@99bb2caf247dfd9f03cf984373bc6043d4e32ebf"
+    used_by:
+      - .github/workflows/iac-scan.yml
+    last_verified: "2026-07-08"
+
+  - id: github-action-benchmark
+    name: benchmark-action/github-action-benchmark
+    homepage: "https://github.com/benchmark-action/github-action-benchmark"
+    kind: action
+    current_version: "v1.22.1"
+    pin: "benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba"
+    used_by:
+      - .github/workflows/benchmark.yml
+    last_verified: "2026-07-08"

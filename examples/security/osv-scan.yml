@@ -1,0 +1,16 @@
+# OSV-Scanner SCA caller (any tier — free on private-free). Replace @<sha>.
+# Private-free callers add `with: { enable_harden_runner: false }`.
+name: osv-scan
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: {}
+concurrency:
+  group: osv-scan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  osv-scan:
+    permissions: { contents: read }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/osv-scan.yml@<sha>
+    with:
+      scan_args: '--recursive .'

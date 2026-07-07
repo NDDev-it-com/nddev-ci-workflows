@@ -7,3 +7,6 @@ dist/
 
 # Local virtualenvs
 .venv/
+
+# Serena MCP local project config (developer tooling, not part of the published catalog)
+/.serena/

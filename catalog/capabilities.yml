@@ -1138,3 +1138,68 @@ capabilities:
     sources:
       - "https://github.com/r-lib/actions"
       - "https://lintr.r-lib.org/"
+
+  - id: coverage-gate
+    name: Coverage gate
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/coverage-gate.yml
+    example: examples/quality/coverage-gate.yml
+    required_permissions:
+      - "contents: read"
+    required_settings:
+      - "CODECOV_TOKEN secret (required for private repos)"
+    risks:
+      - "Coverage thresholds are enforced by the caller's codecov.yml, not this workflow"
+      - "Private-repo runner minutes are metered beyond the included free allotment"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://docs.codecov.com/docs"
+      - "https://github.com/codecov/codecov-action"
+
+  - id: docs-quality
+    name: Docs quality (links, spelling, markdown)
+    cluster: actions-core
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/docs-quality.yml
+    example: examples/quality/docs-quality.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Link checking hits the network; flaky external hosts can fail lychee (tune lychee_args)"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/lycheeverse/lychee-action"
+      - "https://github.com/crate-ci/typos"
+
+  - id: pr-hygiene
+    name: PR hygiene (commitlint, PR title, labeler, stale)
+    cluster: community-dx
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/pr-hygiene.yml
+    example: examples/quality/pr-hygiene.yml
+    required_permissions:
+      - "contents: read"
+      - "pull-requests: write (labeler and stale jobs)"
+      - "issues: write (stale job)"
+    required_settings: []
+    risks:
+      - "labeler on fork PRs needs pull_request_target, which this library intentionally avoids; use it for same-repo PRs"
+      - "Callers must grant the union of the enabled jobs' permissions"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/wagoid/commitlint-github-action"
+      - "https://github.com/actions/labeler"

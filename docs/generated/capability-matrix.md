@@ -4,10 +4,12 @@
 | Capability | Cluster | Status | Public OSS | Private free | Private paid | Workflow | Example |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | actionlint workflow linter (`actionlint`) | actions-core | ga | free | free | available | `.github/workflows/actionlint.yml` | `-` |
+| Coverage gate (`coverage-gate`) | actions-core | ga | free | conditional | available | `.github/workflows/coverage-gate.yml` | `examples/quality/coverage-gate.yml` |
 | C/C++ CI (`cpp-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/cpp-ci.yml` | `examples/languages/cpp.yml` |
 | Cross-platform smoke test (`cross-platform-smoke`) | actions-core | ga | free | free | available | `.github/workflows/cross-platform-smoke.yml` | `-` |
 | Dart/Flutter CI (`dart-flutter-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/dart-flutter-ci.yml` | `examples/languages/dart-flutter.yml` |
 | Docs CI (`docs-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/docs-ci.yml` | `-` |
+| Docs quality (links, spelling, markdown) (`docs-quality`) | actions-core | ga | free | free | available | `.github/workflows/docs-quality.yml` | `examples/quality/docs-quality.yml` |
 | .NET CI (`dotnet-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/dotnet-ci.yml` | `-` |
 | Go CI (`go-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/go-ci.yml` | `-` |
 | Java CI (`java-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/java-ci.yml` | `-` |
@@ -26,6 +28,7 @@
 | HTML/CSS/web CI (`web-ci`) | actions-core | ga | free | conditional | available | `.github/workflows/web-ci.yml` | `examples/languages/web.yml` |
 | GitHub Agentic Workflows (`agentic-workflows`) | ai-agentic | preview | conditional | conditional | conditional | `-` | `-` |
 | GitHub Models (`github-models`) | ai-agentic | retiring | conditional | conditional | conditional | `-` | `-` |
+| PR hygiene (commitlint, PR title, labeler, stale) (`pr-hygiene`) | community-dx | ga | free | free | available | `.github/workflows/pr-hygiene.yml` | `examples/quality/pr-hygiene.yml` |
 | OIDC cloud publishing (`oidc-cloud-publishing`) | deployments | ga | free | free | available | `-` | `-` |
 | Actions cache security (read-only untrusted cache) (`actions-cache-security`) | governance | ga | free | free | available | `-` | `-` |
 | Branch protection (classic) (`branch-protection-classic`) | governance | deprecated | free | conditional | available | `-` | `-` |

@@ -252,3 +252,93 @@ tools:
     used_by:
       - .github/workflows/r-ci.yml
     last_verified: "2026-07-08"
+
+  - id: codecov-action
+    name: codecov/codecov-action
+    homepage: "https://github.com/codecov/codecov-action"
+    kind: action
+    current_version: "v7.0.0"
+    pin: "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f"
+    used_by:
+      - .github/workflows/coverage-gate.yml
+    last_verified: "2026-07-08"
+
+  - id: coveralls-action
+    name: coverallsapp/github-action
+    homepage: "https://github.com/coverallsapp/github-action"
+    kind: action
+    current_version: "v2.3.6"
+    pin: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+    used_by:
+      - .github/workflows/coverage-gate.yml
+    last_verified: "2026-07-08"
+
+  - id: lychee-action
+    name: lycheeverse/lychee-action
+    homepage: "https://github.com/lycheeverse/lychee-action"
+    kind: action
+    current_version: "v2.8.0"
+    pin: "lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411"
+    used_by:
+      - .github/workflows/docs-quality.yml
+    last_verified: "2026-07-08"
+
+  - id: typos-action
+    name: crate-ci/typos
+    homepage: "https://github.com/crate-ci/typos"
+    kind: action
+    current_version: "v1.48.0"
+    pin: "crate-ci/typos@bee27e3a4fd1ea2111cf90ab89cd076c870fce14"
+    used_by:
+      - .github/workflows/docs-quality.yml
+    last_verified: "2026-07-08"
+
+  - id: markdownlint-cli2-action
+    name: DavidAnson/markdownlint-cli2-action
+    homepage: "https://github.com/DavidAnson/markdownlint-cli2-action"
+    kind: action
+    current_version: "v24.0.0"
+    pin: "DavidAnson/markdownlint-cli2-action@8de2aa07cae85fd17c0b35642db70cf5495f1d25"
+    used_by:
+      - .github/workflows/docs-quality.yml
+    last_verified: "2026-07-08"
+
+  - id: commitlint-action
+    name: wagoid/commitlint-github-action
+    homepage: "https://github.com/wagoid/commitlint-github-action"
+    kind: action
+    current_version: "v6.2.1"
+    pin: "wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: semantic-pull-request
+    name: amannn/action-semantic-pull-request
+    homepage: "https://github.com/amannn/action-semantic-pull-request"
+    kind: action
+    current_version: "v6.1.1"
+    pin: "amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: labeler
+    name: actions/labeler
+    homepage: "https://github.com/actions/labeler"
+    kind: action
+    current_version: "v6.1.0"
+    pin: "actions/labeler@f27b608878404679385c85cfa523b85ccb86e213"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"
+
+  - id: stale
+    name: actions/stale
+    homepage: "https://github.com/actions/stale"
+    kind: action
+    current_version: "v10.3.0"
+    pin: "actions/stale@eb5cf3af3ac0a1aa4c9c45633dd1ae542a27a899"
+    used_by:
+      - .github/workflows/pr-hygiene.yml
+    last_verified: "2026-07-08"

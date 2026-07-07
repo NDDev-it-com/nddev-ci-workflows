@@ -342,3 +342,53 @@ tools:
     used_by:
       - .github/workflows/pr-hygiene.yml
     last_verified: "2026-07-08"
+
+  - id: osv-scanner
+    name: osv-scanner
+    homepage: "https://github.com/google/osv-scanner"
+    kind: cli
+    current_version: "v2.4.0"
+    pin: null
+    used_by:
+      - .github/workflows/osv-scan.yml
+    last_verified: "2026-07-08"
+
+  - id: semgrep
+    name: semgrep
+    homepage: "https://github.com/semgrep/semgrep"
+    kind: cli
+    current_version: "v1.168.0"
+    pin: null
+    used_by:
+      - .github/workflows/semgrep-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: anchore-scan-action
+    name: anchore/scan-action
+    homepage: "https://github.com/anchore/scan-action"
+    kind: action
+    current_version: "v7.4.0"
+    pin: "anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2"
+    used_by:
+      - .github/workflows/grype-scan.yml
+    last_verified: "2026-07-08"
+
+  - id: hadolint-action
+    name: hadolint/hadolint-action
+    homepage: "https://github.com/hadolint/hadolint-action"
+    kind: action
+    current_version: "v3.3.0"
+    pin: "hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5"
+    used_by:
+      - .github/workflows/hadolint-ci.yml
+    last_verified: "2026-07-08"
+
+  - id: checkov-action
+    name: bridgecrewio/checkov-action
+    homepage: "https://github.com/bridgecrewio/checkov-action"
+    kind: action
+    current_version: "v12.1347.0"
+    pin: "bridgecrewio/checkov-action@99bb2caf247dfd9f03cf984373bc6043d4e32ebf"
+    used_by:
+      - .github/workflows/iac-scan.yml
+    last_verified: "2026-07-08"

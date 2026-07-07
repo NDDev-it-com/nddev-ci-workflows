@@ -14,10 +14,14 @@
 | `.github/workflows/docs-quality.yml` | `docs-quality` | ga |
 | `.github/workflows/dotnet-ci.yml` | `dotnet-ci` | ga |
 | `.github/workflows/go-ci.yml` | `go-ci` | ga |
+| `.github/workflows/grype-scan.yml` | `grype-sca` | ga |
+| `.github/workflows/hadolint-ci.yml` | `hadolint-dockerfile` | ga |
+| `.github/workflows/iac-scan.yml` | `iac-scan-checkov` | ga |
 | `.github/workflows/java-ci.yml` | `java-ci` | ga |
 | `.github/workflows/kotlin-android-ci.yml` | `kotlin-android-ci` | ga |
 | `.github/workflows/monorepo-changed-paths.yml` | `monorepo-changed-paths` | ga |
 | `.github/workflows/node-ci.yml` | `node-ci` | ga |
+| `.github/workflows/osv-scan.yml` | `osv-scanner-sca` | ga |
 | `.github/workflows/pr-hygiene.yml` | `pr-hygiene` | ga |
 | `.github/workflows/private-static.yml` | `private-static-validation` | ga |
 | `.github/workflows/public-codeql.yml` | `codeql-code-scanning` | ga |
@@ -31,6 +35,7 @@
 | `.github/workflows/release.yml` | internal | internal |
 | `.github/workflows/rust-ci.yml` | `rust-ci` | ga |
 | `.github/workflows/secret-scan.yml` | `gitleaks-secret-scan` | ga |
+| `.github/workflows/semgrep-ci.yml` | `semgrep-sast` | ga |
 | `.github/workflows/sql-ci.yml` | `sql-ci` | ga |
 | `.github/workflows/swift-ci.yml` | `swift-ci` | ga |
 | `.github/workflows/terraform-ci.yml` | `terraform-ci` | ga |

@@ -1203,3 +1203,106 @@ capabilities:
     sources:
       - "https://github.com/wagoid/commitlint-github-action"
       - "https://github.com/actions/labeler"
+
+  - id: semgrep-sast
+    name: Semgrep OSS SAST
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/semgrep-ci.yml
+    example: examples/security/semgrep.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Gate-only (no SARIF); use CodeQL/GHAS for code-scanning alerts on paid tiers"
+      - "Registry rulesets (p/ci) are fetched at runtime; pin semgrep_version for reproducibility"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://semgrep.dev/docs/"
+      - "https://github.com/semgrep/semgrep"
+
+  - id: osv-scanner-sca
+    name: OSV-Scanner SCA
+    cluster: supply-chain
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/osv-scan.yml
+    example: examples/security/osv-scan.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Checksum-pinned binary; bump osv_scanner_version and osv_scanner_sha256 together"
+      - "Gate-only free alternative to GitHub dependency review on private-free repos"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://google.github.io/osv-scanner/"
+      - "https://github.com/google/osv-scanner"
+
+  - id: grype-sca
+    name: Grype vulnerability scan
+    cluster: supply-chain
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/grype-scan.yml
+    example: examples/security/grype-scan.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Gate-only (table output); wire SARIF + code scanning separately on paid tiers"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/anchore/grype"
+      - "https://github.com/anchore/scan-action"
+
+  - id: hadolint-dockerfile
+    name: hadolint Dockerfile lint
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/hadolint-ci.yml
+    example: examples/security/hadolint.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Tune failure_threshold and ignore to match your Dockerfile policy"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://github.com/hadolint/hadolint"
+      - "https://github.com/hadolint/hadolint-action"
+
+  - id: iac-scan-checkov
+    name: IaC scan (Checkov)
+    cluster: security-scanning
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/iac-scan.yml
+    example: examples/security/iac-scan.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Gate-only (CLI output); wire SARIF upload separately for code-scanning alerts"
+      - "Broadens Terraform-CI coverage to Kubernetes/CloudFormation/Helm/ARM"
+    deprecations: null
+    last_verified: "2026-07-08"
+    sources:
+      - "https://www.checkov.io/"
+      - "https://github.com/bridgecrewio/checkov-action"

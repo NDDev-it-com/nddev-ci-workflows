@@ -1,0 +1,16 @@
+# Semgrep OSS SAST caller (any tier — free on private-free). Replace @<sha>.
+# Private-free callers add `with: { enable_harden_runner: false }`.
+name: semgrep
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: {}
+concurrency:
+  group: semgrep-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  semgrep:
+    permissions: { contents: read }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/semgrep-ci.yml@<sha>
+    with:
+      config: p/ci

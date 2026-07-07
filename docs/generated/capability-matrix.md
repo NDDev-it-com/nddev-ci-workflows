@@ -48,16 +48,21 @@
 | Container build and Trivy scan (`container-scan-trivy`) | security-scanning | ga | free | free | available | `.github/workflows/container-ci.yml` | `-` |
 | Copilot Autofix for code scanning (`copilot-autofix`) | security-scanning | ga | free | unavailable | available | `-` | `-` |
 | Gitleaks secret scan (`gitleaks-secret-scan`) | security-scanning | ga | free | free | available | `.github/workflows/secret-scan.yml` | `-` |
+| hadolint Dockerfile lint (`hadolint-dockerfile`) | security-scanning | ga | free | free | available | `.github/workflows/hadolint-ci.yml` | `examples/security/hadolint.yml` |
+| IaC scan (Checkov) (`iac-scan-checkov`) | security-scanning | ga | free | free | available | `.github/workflows/iac-scan.yml` | `examples/security/iac-scan.yml` |
 | GitHub native secret scanning (`native-secret-scanning`) | security-scanning | ga | free | unavailable | available | `-` | `-` |
 | OpenSSF Scorecard SARIF (`ossf-scorecard`) | security-scanning | ga | free | unavailable | conditional | `.github/workflows/public-scorecard.yml` | `-` |
 | OpenSSF Scorecard JSON artifact (`ossf-scorecard-json`) | security-scanning | ga | free | unavailable | conditional | `.github/workflows/public-scorecard-json.yml` | `examples/public-oss/scorecard.yml` |
+| Semgrep OSS SAST (`semgrep-sast`) | security-scanning | ga | free | free | available | `.github/workflows/semgrep-ci.yml` | `examples/security/semgrep.yml` |
 | zizmor workflow security scanner (`zizmor`) | security-scanning | ga | free | free | available | `.github/workflows/zizmor-sarif.yml` | `-` |
 | zizmor workflow security scanner (no SARIF) (`zizmor-no-sarif`) | security-scanning | ga | free | free | available | `.github/workflows/zizmor-no-sarif.yml` | `examples/private-free/security.yml` |
 | Artifact attestations (`artifact-attestations`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |
 | Dependabot version and security updates (`dependabot`) | supply-chain | ga | free | free | available | `-` | `-` |
 | Dependency review (`dependency-review`) | supply-chain | ga | free | unavailable | available | `.github/workflows/public-dependency-review.yml` | `examples/public-oss/dependency-review.yml` |
+| Grype vulnerability scan (`grype-sca`) | supply-chain | ga | free | free | available | `.github/workflows/grype-scan.yml` | `examples/security/grype-scan.yml` |
 | StepSecurity Harden-Runner egress control (`harden-runner`) | supply-chain | ga | free | conditional | conditional | `-` | `-` |
 | Open source license compliance (`license-compliance-preview`) | supply-chain | preview | unavailable | unavailable | conditional | `-` | `-` |
+| OSV-Scanner SCA (`osv-scanner-sca`) | supply-chain | ga | free | free | available | `.github/workflows/osv-scan.yml` | `examples/security/osv-scan.yml` |
 | SBOM generation (`sbom-generation`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |
 | SLSA build provenance (`slsa-build-provenance`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |
 

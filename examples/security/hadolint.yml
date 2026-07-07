@@ -1,0 +1,16 @@
+# hadolint Dockerfile lint caller (any tier). Replace @<sha>.
+# Private-free callers add `with: { enable_harden_runner: false }`.
+name: hadolint
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: {}
+concurrency:
+  group: hadolint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  hadolint:
+    permissions: { contents: read }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/hadolint-ci.yml@<sha>
+    with:
+      recursive: true

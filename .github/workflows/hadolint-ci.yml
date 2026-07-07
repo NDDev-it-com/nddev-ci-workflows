@@ -1,0 +1,60 @@
+name: hadolint-ci
+
+# Reusable Dockerfile linter (hadolint) for BOTH tiers. Free everywhere.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      dockerfile:
+        type: string
+        default: 'Dockerfile'
+      recursive:
+        description: 'Lint every Dockerfile in the tree.'
+        type: boolean
+        default: false
+      failure_threshold:
+        description: 'Fail at/above: error, warning, info, or style.'
+        type: string
+        default: 'warning'
+      ignore:
+        description: 'Comma/space-separated rule codes to ignore, e.g. "DL3008 DL3059".'
+        type: string
+        default: ''
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 10
+
+permissions: {}
+
+jobs:
+  hadolint:
+    name: hadolint
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: hadolint
+        uses: hadolint/hadolint-action@2332a7b74a6de0dda2e2221d575162eba76ba5e5  # v3.3.0
+        with:
+          dockerfile: ${{ inputs.dockerfile }}
+          recursive: ${{ inputs.recursive }}
+          failure-threshold: ${{ inputs.failure_threshold }}
+          ignore: ${{ inputs.ignore }}

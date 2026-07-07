@@ -1,0 +1,16 @@
+# Checkov IaC scan caller (any tier). Replace @<sha>.
+# Private-free callers add `with: { enable_harden_runner: false }`.
+name: iac-scan
+on:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+permissions: {}
+concurrency:
+  group: iac-scan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  iac-scan:
+    permissions: { contents: read }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/iac-scan.yml@<sha>
+    with:
+      framework: terraform

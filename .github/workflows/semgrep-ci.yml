@@ -1,0 +1,84 @@
+name: semgrep-ci
+
+# Reusable Semgrep OSS SAST for BOTH tiers. Free on private-free repos, where
+# CodeQL is a paid GHAS feature. Gate-only: findings fail the job and no SARIF is
+# uploaded, so no code-scanning (security-events) permission is required.
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'ubuntu-latest'
+      working_directory:
+        type: string
+        default: '.'
+      config:
+        description: 'Semgrep ruleset(s): p/ci, p/default, p/security-audit, or a local path.'
+        type: string
+        default: 'p/ci'
+      semgrep_version:
+        description: 'Exact semgrep version to pin (empty installs the latest release).'
+        type: string
+        default: ''
+      extra_args:
+        type: string
+        default: ''
+      enable_harden_runner:
+        type: boolean
+        default: true
+      timeout_minutes:
+        type: number
+        default: 20
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  semgrep:
+    name: semgrep
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+    steps:
+      - name: Harden runner
+        if: ${{ inputs.enable_harden_runner }}
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: '3.13'
+
+      - name: Install Semgrep
+        env:
+          SEMGREP_VERSION: ${{ inputs.semgrep_version }}
+        run: |
+          if [ -n "$SEMGREP_VERSION" ]; then
+            python -m pip install --disable-pip-version-check "semgrep==${SEMGREP_VERSION}"
+          else
+            python -m pip install --disable-pip-version-check semgrep
+          fi
+
+      - name: Semgrep scan
+        env:
+          SEMGREP_CONFIG: ${{ inputs.config }}
+          SEMGREP_EXTRA_ARGS: ${{ inputs.extra_args }}
+        run: |
+          # shellcheck disable=SC2086
+          semgrep scan --error --metrics off --config "$SEMGREP_CONFIG" $SEMGREP_EXTRA_ARGS
+          echo "Semgrep SAST passed." >> "$GITHUB_STEP_SUMMARY"

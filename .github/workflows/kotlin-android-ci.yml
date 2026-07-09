@@ -1,6 +1,6 @@
 name: kotlin-android-ci
 
-# Reusable Kotlin/Android CI for BOTH tiers: harden-runner, pinned setup-java +
+# Reusable Kotlin/Android CI for BOTH tiers: pinned setup-java +
 # setup-gradle (with Gradle cache), optional Android SDK, and caller-provided
 # lint/build commands passed via env. Works for pure-JVM Kotlin and Android.
 
@@ -35,9 +35,6 @@ on:
         description: 'Build/test command (bash).'
         type: string
         default: './gradlew build'
-      enable_harden_runner:
-        type: boolean
-        default: true
       timeout_minutes:
         type: number
         default: 30
@@ -59,12 +56,6 @@ jobs:
       run:
         working-directory: ${{ inputs.working_directory }}
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner && runner.os == 'Linux' }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

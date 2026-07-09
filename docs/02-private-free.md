@@ -16,16 +16,16 @@ them in the private-free tier:
 | CodeQL code scanning | Paid (GHAS) on private | [03 GHAS](03-private-paid-ghas.md) |
 | Native secret scanning + push protection | Paid (Secret Protection) on private | [03 GHAS](03-private-paid-ghas.md) |
 | Dependency review action | Paid (GHAS) on private | [03 GHAS](03-private-paid-ghas.md) |
-| `step-security/harden-runner` | Paid on private repos | pass `enable_harden_runner: false` |
-| SARIF upload to code scanning | Requires code scanning (paid) | pass `upload_sarif: false` |
+| `step-security/harden-runner` | Paid on private repos | use a private-free workflow with no action reference |
+| SARIF upload to code scanning | Requires code scanning (paid) | use the no-SARIF workflow variant |
 
 ## The zero-cost private stack
 
 | Capability | Workflow | Notes |
 | --- | --- | --- |
-| Workflow YAML lint | `actionlint.yml` | `enable_harden_runner: false` |
+| Workflow YAML lint | `actionlint.yml` | contains no paid action |
 | Actions static analysis | `zizmor-no-sarif.yml` | fails on findings, no upload |
-| Secret scanning (history-aware) | `secret-scan.yml` | gitleaks; `enable_harden_runner: false` |
+| Secret scanning (history-aware) | `secret-scan.yml` | gitleaks; contains no paid action |
 | Static validation | `private-static.yml` | single Ubuntu job, no matrix/cache |
 | Local SBOM + attestations | `release-supply-chain.yml` | attestations work on private |
 | Cross-platform smoke | `cross-platform-smoke.yml` | OS matrix |
@@ -44,18 +44,12 @@ jobs:
   secret-scan:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/secret-scan.yml@<full-sha>
-    with:
-      enable_harden_runner: false
   actionlint:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/actionlint.yml@<full-sha>
-    with:
-      enable_harden_runner: false
   zizmor:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/zizmor-no-sarif.yml@<full-sha>
-    with:
-      enable_harden_runner: false
   validate:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/private-static.yml@<full-sha>
@@ -72,7 +66,7 @@ jobs:
 
 Lints workflow YAML for syntax errors, expression typos, and deprecated usage.
 The binary is downloaded pinned and **checksum-verified** (`actionlint_sha256`).
-Free everywhere. Pass `enable_harden_runner: false` on private.
+Free everywhere. Its reusable workflow contains no Harden-Runner reference.
 
 ## gitleaks (`secret-scan.yml`)
 
@@ -130,4 +124,4 @@ auto-scale (e.g. Actions Runner Controller), and treat egress carefully — see
 [05 Runners](05-runners.md#self-hosted).
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

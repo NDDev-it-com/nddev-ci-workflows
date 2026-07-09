@@ -1,6 +1,6 @@
 name: rust-ci
 
-# Reusable Rust CI for BOTH tiers: harden-runner, pinned Rust toolchain (with
+# Reusable Rust CI for BOTH tiers: pinned Rust toolchain (with
 # built-in cargo cache), and caller-provided build/test commands passed via env.
 
 on:
@@ -27,9 +27,6 @@ on:
         description: 'Test/verify command (bash).'
         type: string
         default: 'cargo test --locked'
-      enable_harden_runner:
-        type: boolean
-        default: true
       timeout_minutes:
         type: number
         default: 30
@@ -51,12 +48,6 @@ jobs:
       run:
         working-directory: ${{ inputs.working_directory }}
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

@@ -60,8 +60,6 @@ body:
         jobs:
           secret-scan:
             uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/secret-scan.yml@<sha>
-            with:
-              enable_harden_runner: false
     validations:
       required: true
   - type: textarea

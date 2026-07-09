@@ -47,9 +47,6 @@ on:
       timeout_minutes:
         type: number
         default: 15
-      enable_harden_runner:
-        type: boolean
-        default: true
 
 permissions: {}
 
@@ -65,12 +62,6 @@ jobs:
       matrix:
         os: ${{ fromJSON(inputs.os_list) }}
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner && runner.os == 'Linux' }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

@@ -14,9 +14,10 @@ response as soon as reasonably possible.
   `uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/<name>.yml@<40-char-sha>`.
   Tags are mutable; a full SHA is immutable. Dependabot can bump the pinned SHA.
 - Grant the calling job only the permissions the reusable declares it needs.
-- Treat the private free tier (`enable_harden_runner: false`,
-  `upload_sarif: false`) as the correct choice for private repositories, where
-  code scanning, native secret scanning, and harden-runner are paid features.
+- Use the dedicated private-free workflows for private repositories without
+  paid services. They contain no Harden-Runner action and use no SARIF upload;
+  code scanning, native secret scanning, and Harden-Runner require paid plans
+  on private repositories.
 
 ## Posture of this repository
 
@@ -26,6 +27,8 @@ response as soon as reasonably possible.
 - `ci.yml` runs static validators (`scripts/validate_all.py`), `actionlint`, and
   `zizmor` (regular persona, SARIF) against this repository's own workflows on
   every push and pull request; `ci-gate` aggregates them.
+- `check_harden_runner_contract.py` rejects conditional Harden-Runner steps and
+  any paid runtime-hardening reference in cross-tier/private-free workflows.
 - `main` is protected by a repository ruleset (`.github/rulesets/branch-main.json`):
   signed commits, required review + code-owner review, linear history, no
   force-push or deletion, and the `ci-gate` status check. Release tags are

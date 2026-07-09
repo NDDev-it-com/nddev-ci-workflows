@@ -1,6 +1,6 @@
 name: web-ci
 
-# Reusable HTML/CSS/web CI for BOTH tiers: harden-runner, pinned setup-node, and
+# Reusable HTML/CSS/web CI for BOTH tiers: pinned setup-node, and
 # caller-provided lint/test commands passed via env. The default lint step runs
 # stylelint + htmlhint; callers can add Lighthouse CI or pa11y via test_command.
 
@@ -35,9 +35,6 @@ on:
         description: 'Additional test/verify command (bash), e.g. Lighthouse CI or pa11y. Empty to skip.'
         type: string
         default: ''
-      enable_harden_runner:
-        type: boolean
-        default: true
       timeout_minutes:
         type: number
         default: 15
@@ -59,12 +56,6 @@ jobs:
       run:
         working-directory: ${{ inputs.working_directory }}
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

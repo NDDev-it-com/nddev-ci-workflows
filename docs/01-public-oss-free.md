@@ -18,7 +18,7 @@ delivers its full value.
 | GHCR (public packages) | ✅ | [09 Releases & packages](09-releases-packages.md) |
 | GitHub Pages | ✅ | [10 Deployments & environments](10-deployments-environments.md) |
 | Repository rulesets | ✅ | [08 Governance & rulesets](08-governance-rulesets.md) |
-| harden-runner egress control | ✅ | dual-tier workflows (`enable_harden_runner: true`) |
+| harden-runner egress control | ✅ | explicit public/GHAS workflows |
 
 > Standard GitHub-hosted runners are free with unlimited minutes on public
 > repositories. Larger, GPU, and macOS-XL runners are billable **even for

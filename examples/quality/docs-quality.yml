@@ -1,5 +1,4 @@
 # Docs quality caller (any tier). Replace @<sha> with a pinned full commit SHA.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: docs-quality
 on:
   push: { branches: [main] }

@@ -1,5 +1,4 @@
 # Java CI caller (any tier). Replace @<sha> with a pinned full commit SHA.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: java
 on:
   push: { branches: [main] }

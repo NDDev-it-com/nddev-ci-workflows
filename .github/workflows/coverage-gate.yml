@@ -1,6 +1,6 @@
 name: coverage-gate
 
-# Reusable coverage upload for BOTH tiers: harden-runner, a caller-provided
+# Reusable coverage upload for BOTH tiers: a caller-provided
 # coverage command, and a Codecov upload (free on public; token-gated on
 # private) with an optional Coveralls upload. Coverage thresholds are enforced by
 # the caller's codecov.yml, not here.
@@ -38,9 +38,6 @@ on:
         description: 'Coverage file for Coveralls, e.g. coverage/lcov.info.'
         type: string
         default: ''
-      enable_harden_runner:
-        type: boolean
-        default: true
       timeout_minutes:
         type: number
         default: 20
@@ -65,12 +62,6 @@ jobs:
       run:
         working-directory: ${{ inputs.working_directory }}
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

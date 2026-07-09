@@ -145,7 +145,7 @@ capabilities:
     required_settings: []
     risks:
       - "Digest-pinned container image must be bumped by Dependabot to stay current"
-      - "harden-runner step is gated behind enable_harden_runner (paid on private)"
+      - "Private-free contract intentionally contains no paid runtime-hardening action"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -220,20 +220,22 @@ capabilities:
     cluster: supply-chain
     status: ga
     public_oss: free
-    private_free: conditional
-    private_paid: conditional
+    private_free: unavailable
+    private_paid: available
     workflow: null
     example: null
     required_permissions: []
     required_settings:
       - "Free on public repositories; requires a paid StepSecurity plan on private repositories"
     risks:
-      - "Paid on private repos; dual-tier workflows gate it behind enable_harden_runner (default true, set false on private)"
+      - "JavaScript pre/post hooks make a step-level boolean unsafe as a disable mechanism; keep the action out of private-free workflows"
       - "egress_policy audit only observes; set block to enforce an allow-list"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-10"
     sources:
       - "https://github.com/step-security/harden-runner"
+      - "https://docs.stepsecurity.io/harden-runner"
+      - "https://www.stepsecurity.io/pricing"
 
   - id: cross-platform-smoke
     name: Cross-platform smoke test
@@ -250,7 +252,7 @@ capabilities:
     risks:
       - "Use OS-specific command overrides when a smoke command is not portable across Linux, macOS, and Windows"
       - "macOS and Windows runner minutes are billed at a multiplier on private repos"
-      - "harden-runner step only runs on the Linux matrix leg"
+      - "Cross-tier contract intentionally contains no paid runtime-hardening action"
     deprecations: null
     last_verified: "2026-07-04"
     sources:
@@ -1111,7 +1113,7 @@ capabilities:
     required_settings: []
     risks:
       - "Defaults to a macOS runner billed at a 10x minute multiplier; SwiftLint runs on macOS only"
-      - "harden-runner only runs on the Linux leg (it is a Linux/paid feature)"
+      - "Cross-tier contract intentionally contains no paid runtime-hardening action"
     deprecations: null
     last_verified: "2026-07-08"
     sources:

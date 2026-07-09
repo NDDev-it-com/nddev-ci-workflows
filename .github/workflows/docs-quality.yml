@@ -1,6 +1,6 @@
 name: docs-quality
 
-# Reusable docs quality gate for BOTH tiers: harden-runner, link checking
+# Reusable docs quality gate for BOTH tiers: link checking
 # (lychee), spell checking (typos), and Markdown linting (markdownlint-cli2).
 # Every tool is free on every tier.
 
@@ -32,9 +32,6 @@ on:
       markdownlint_globs:
         type: string
         default: '**/*.md'
-      enable_harden_runner:
-        type: boolean
-        default: true
       timeout_minutes:
         type: number
         default: 15
@@ -49,12 +46,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

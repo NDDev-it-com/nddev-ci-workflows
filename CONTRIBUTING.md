@@ -72,16 +72,18 @@ A PR that misses any of them will not be merged.
    ```
 
    `zizmor` will flag `template-injection`; treat that as a hard failure.
-7. **Dual-tier toggles where relevant.** Any capability that is paid on private
-   repositories must expose `enable_harden_runner` and/or `upload_sarif` inputs
-   (defaulting to `true`) so private callers can set them `false`. Never make a
-   paid feature unconditional in a dual-tier workflow.
+7. **Separate paid and private-free contracts.** A workflow available to the
+   private-free tier must not reference a paid action or GitHub feature. Split
+   SARIF/no-SARIF workflows and public/GHAS runtime hardening at the file
+   boundary; never try to disable an action with lifecycle hooks through a
+   step-level boolean condition.
 8. **Reusable contract.** Every workflow intended for callers must declare
    `on: workflow_call:` and document its inputs in a header comment. The self-CI
    contract job verifies this.
-9. **Harden the runner.** Prefer `step-security/harden-runner` with an egress
-   policy (`audit` by default, `block` where the endpoint set is known), gated
-   behind `enable_harden_runner` in dual-tier workflows.
+9. **Harden public/GHAS jobs explicitly.** Use
+   `step-security/harden-runner` as the unconditional first step with an egress
+   policy (`audit` by default, `block` where the endpoint set is known). Do not
+   reference it from cross-tier or private-free workflows.
 
 ## Local checks
 
@@ -91,16 +93,18 @@ Run these before opening a PR (they mirror the self-CI `ci-gate`):
 # Lint all workflow YAML
 actionlint
 
-# Workflow security analysis (pedantic, matches CI)
-zizmor --pedantic .github/workflows
+# Workflow security analysis (regular persona, matches CI)
+zizmor --persona regular --min-severity low .github/workflows
 
-# Reusable-workflow contract: every reusable declares on: workflow_call
-grep -L 'workflow_call:' .github/workflows/public-*.yml \
-  .github/workflows/{secret-scan,actionlint,zizmor,cross-platform-smoke,private-static,release-supply-chain}.yml
+# Complete repository contract, catalog, example, and generated-doc checks
+python3 scripts/validate_all.py
 ```
 
-If a `scripts/validate_all.py` aggregator is present in your checkout, run
-`python3 scripts/validate_all.py` as well — it wraps the checks above.
+Install validator dependencies with the hash-locked file:
+
+```bash
+python3 -m pip install --require-hashes -r requirements-ci.txt
+```
 
 Install the tools locally with:
 

@@ -16,9 +16,6 @@ on:
         description: 'SHA256 of actionlint_<ver>_linux_amd64.tar.gz from upstream checksums.txt.'
         type: string
         default: '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8'
-      enable_harden_runner:
-        type: boolean
-        default: true
       post_command:
         description: 'Optional extra static check after actionlint, e.g. a repository-local pin validator.'
         type: string
@@ -34,19 +31,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: block
-          allowed-endpoints: >
-            agent.api.stepsecurity.io:443
-            api.github.com:443
-            github.com:443
-            codeload.github.com:443
-            objects.githubusercontent.com:443
-            release-assets.githubusercontent.com:443
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

@@ -418,11 +418,12 @@ capabilities:
       - "Immutable releases enabled (GA 2025-10-28)"
     risks:
       - "Assets cannot be modified, deleted, or clobbered once published"
+      - "Release titles and bodies remain editable; integrity-sensitive notes must also be a checksummed immutable asset"
       - "'gh release upload --clobber' actively FAILS on an immutable release; publish all assets in one shot or draft-then-publish and fail-if-exists"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-10"
     sources:
-      - "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      - "https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository"
 
   - id: rulesets
     name: Repository rulesets
@@ -725,11 +726,12 @@ capabilities:
       - "Immutable-releases-compatible publish flow (no --clobber)"
     risks:
       - "Immutable releases make --clobber fail; the workflow must create the release with all assets in one shot or draft-then-publish and fail-if-exists"
+      - "GitHub release notes remain editable; release-notes.md is therefore published as a checksummed immutable asset"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-10"
     sources:
       - "https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds"
-      - "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases"
+      - "https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository"
 
   - id: npm-trusted-publishing
     name: npm trusted publishing

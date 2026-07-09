@@ -16,6 +16,7 @@ push tag X.Y.Z
       └─ release-supply-chain.yml
           ├─ tracked-source archive
           ├─ exact-payload SPDX SBOM
+          ├─ canonical release notes
           ├─ manifest + SHA256SUMS
           ├─ Sigstore attestations
           └─ immutable GitHub Release
@@ -64,13 +65,16 @@ fail if it exists) or **draft → attach → publish**. `gh release upload
 --clobber` **fails** on an immutable release — never rely on it. Full guidance
 and commands: [07 Supply chain](07-supply-chain-slsa-sbom-attestations.md#immutable-releases-ga-2025-10-28).
 
-The release has exactly four assets: the tracked-source archive, its SPDX SBOM,
-`release-manifest.json`, and `SHA256SUMS`. The manifest declares that complete
-set and records the source tag object plus peeled commit; the checksum file
-covers the other three assets. Changelog-derived or explicit release notes are
-passed as release metadata from outside the asset directory. Checksum-pinned
-Syft scans an extracted copy of the exact archive, not the wider caller
-checkout, and the remote tag object is revalidated immediately before publish.
+The release has exactly five assets: the tracked-source archive, its SPDX SBOM,
+canonical `release-notes.md`, `release-manifest.json`, and `SHA256SUMS`. The
+manifest declares that complete set and records the source tag object plus
+peeled commit; the checksum file covers the other four assets. The same
+changelog-derived or explicit canonical notes file is used as the initial
+release body. GitHub permits an immutable release's title and body to be edited,
+so consumers should treat the checksummed notes asset, not release metadata, as
+the integrity boundary. Checksum-pinned Syft scans an extracted copy of the
+exact archive, not the wider caller checkout, and the remote tag object is
+revalidated immediately before publish.
 
 ### Migrating from 0.4.x to 0.5.0
 
@@ -80,12 +84,17 @@ regular-file selections. An explicit `notes_file` must be tracked, regular, and
 not a symlink. These are intentional breaking changes to close archive/SBOM and
 immutable-release integrity gaps.
 
+`0.5.1` preserves that caller contract and adds canonical release notes to the
+immutable manifest/checksum boundary.
+
 ## CHANGELOG-driven notes
 
 Release notes are extracted from the `## [X.Y.Z]` section of `CHANGELOG.md` (or
-from a regular non-symlink `notes_file` tracked by the release tag). Keep a
+from a regular non-symlink `notes_file` tracked by the release tag). The result
+must contain non-whitespace UTF-8 content and becomes both the checksummed
+`release-notes.md` asset and the initial release body. Keep a
 Keep-a-Changelog-style file with an `[Unreleased]` section that you promote to a
-version on release.
+version on release. A release must provide one of those two non-empty sources.
 
 ## GHCR (container packages)
 

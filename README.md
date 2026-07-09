@@ -168,8 +168,9 @@ jobs:
       archive_paths: "README.md LICENSE VERSION CHANGELOG.md src"
 ```
 
-The release is **immutable** and ships an SPDX SBOM, SHA256SUMS, a build-provenance
-attestation, and an SBOM attestation (SLSA v1.0 Build L3). Verify with
+The release is **immutable** and ships canonical checksummed release notes, an
+SPDX SBOM, SHA256SUMS, a build-provenance attestation, and an SBOM attestation
+(SLSA v1.0 Build L3). Verify with
 [`scripts/verify_attestations.sh`](scripts/verify_attestations.sh). See
 [`docs/07-supply-chain-slsa-sbom-attestations.md`](docs/07-supply-chain-slsa-sbom-attestations.md).
 
@@ -181,13 +182,17 @@ contains untracked output. Symlinks, submodules, and non-regular entries are
 rejected. The reusable validates input syntax before checkout, checks out the
 exact tag, and revalidates that tag's `VERSION` and tracked changelog heading.
 The release version must have exactly one matching changelog heading.
+Canonical notes must come from that non-empty section or from a tracked,
+regular, non-symlink UTF-8 `notes_file` with non-whitespace content.
 The SBOM scans the exact extracted archive payload. Every release publishes
-exactly four assets: the archive, `sbom.spdx.json`, `release-manifest.json`, and
-`SHA256SUMS`; release notes remain release metadata, not an asset. Syft 1.42.3
-is downloaded directly for Linux X64/ARM64 runners and verified against pinned
-archive size and SHA-256 before execution; no remote installer script runs. The
-manifest records the source tag object and peeled commit, and the remote tag is
-revalidated immediately before publication.
+exactly five assets: the archive, `sbom.spdx.json`, `release-notes.md`,
+`release-manifest.json`, and `SHA256SUMS`. The same canonical notes file is used
+for the release body and is checksum-bound because GitHub permits immutable
+release metadata to be edited. Syft 1.42.3 is downloaded directly for Linux
+X64/ARM64 runners and verified against pinned archive size and SHA-256 before
+execution; no remote installer script runs. The manifest records the source tag
+object and peeled commit, and the remote tag is revalidated immediately before
+publication.
 
 ### Migrating release callers to 0.5.0
 
@@ -196,6 +201,9 @@ make every `archive_paths` selection a normalized relative tracked path whose
 expansion contains regular files only. `VERSION` is mandatory and exact, and an
 explicit `notes_file` must be a tracked regular non-symlink file. These are
 intentional fail-closed changes from the 0.4.x contract.
+
+Pin `0.5.1` or its full commit SHA to include canonical release notes in the
+immutable manifest/checksum boundary. No caller input changed from `0.5.0`.
 
 ## Common inputs
 

@@ -2,8 +2,9 @@
 
 This is the heart of the library: producing verifiable evidence of *what was
 built, from what source, by which workflow*. `release-supply-chain.yml`
-implements the whole chain — deterministic archive, SPDX SBOM, `SHA256SUMS`,
-Sigstore-backed attestations, and an immutable GitHub Release.
+implements the whole chain — deterministic archive, SPDX SBOM, canonical
+release notes, `SHA256SUMS`, Sigstore-backed attestations, and an immutable
+GitHub Release.
 
 ## SLSA levels and how we reach Build L3
 
@@ -77,9 +78,9 @@ the pinned Syft path for a build-artifact SBOM.
 
 ## SHA256SUMS
 
-Alongside the archive, SBOM, and manifest, the release publishes `SHA256SUMS`
-covering those other three assets so consumers can verify byte integrity
-independently of Sigstore:
+Alongside the archive, SBOM, canonical release notes, and manifest, the release
+publishes `SHA256SUMS` covering those other four assets so consumers can verify
+byte integrity independently of Sigstore:
 
 ```bash
 sha256sum -c SHA256SUMS
@@ -125,17 +126,21 @@ assets cannot be modified, deleted, or clobbered.** This changes how you publish
 - Publish by **creating the release with all assets in one shot** (fail if the
   release already exists), or **create a draft, attach every asset, then
   publish**.
+- GitHub still permits an immutable release's title and body to be edited. Use
+  the checksummed `release-notes.md` asset as the canonical note record and as
+  the initial body source; do not treat mutable release metadata as the
+  integrity boundary.
 
 ```bash
 # One-shot create with all assets; fails if the tag's release already exists
 release_dist="${RUNNER_TEMP}/release-dist"
-release_notes="${RUNNER_TEMP}/release-notes.md"
 gh release create "$VERSION" \
   --verify-tag \
   --title "$VERSION" \
-  --notes-file "$release_notes" \
+  --notes-file "$release_dist/release-notes.md" \
   "$release_dist/my-app-${VERSION}.tar.gz" \
   "$release_dist/sbom.spdx.json" \
+  "$release_dist/release-notes.md" \
   "$release_dist/release-manifest.json" \
   "$release_dist/SHA256SUMS"
 ```
@@ -146,6 +151,7 @@ gh release create "$VERSION" --draft --verify-tag --title "$VERSION"
 gh release upload "$VERSION" \
   "$release_dist/my-app-${VERSION}.tar.gz" \
   "$release_dist/sbom.spdx.json" \
+  "$release_dist/release-notes.md" \
   "$release_dist/release-manifest.json" \
   "$release_dist/SHA256SUMS"
 gh release edit "$VERSION" --draft=false
@@ -169,11 +175,12 @@ See [09 Releases & packages](09-releases-packages.md) for the tag-driven flow.
    list.
 4. Extract that archive privately, verify its file/digest closure, and generate
    the SPDX SBOM from only that exact payload with checksum-pinned Syft.
-5. Emit `release-manifest.json` with source tag/commit identity, compute
-   `SHA256SUMS`, and require exactly the four declared regular assets.
+5. Materialize non-empty canonical `release-notes.md`, emit
+   `release-manifest.json` with source tag/commit identity, compute `SHA256SUMS`,
+   and require exactly the five declared regular assets.
 6. Attest the archive and the SBOM (Sigstore keyless).
-7. Revalidate the remote tag object and publish those four assets in one
-   immutable create call; notes stay metadata.
+7. Revalidate the remote tag object and publish those five assets in one
+   immutable create call, using the canonical notes asset as the release body.
 
 ---
 Last verified: 2026-07-10

@@ -2,6 +2,27 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-07-10
+
+### Security
+
+- Materialize canonical release notes inside the closed release directory before
+  the manifest and checksums are generated. The immutable downloadable notes
+  asset now preserves release-note integrity even though GitHub permits the
+  release title and body to be edited after publication.
+- Require changelog-derived and explicit notes to be tracked, regular,
+  non-symlink UTF-8 files with non-whitespace content, and refuse a pre-existing
+  canonical output path.
+
+### Fixed
+
+- Publish `release-notes.md` as the fifth explicit immutable asset, declare it in
+  `release-manifest.json`, cover it with `SHA256SUMS`, and use that exact file as
+  the GitHub Release body in the same single create call.
+- Extend the embedded-program validator with positive and adversarial fixtures
+  for canonical notes, missing or undeclared assets, exact five-asset publish
+  arguments, and checksum closure.
+
 ## [0.5.0] - 2026-07-10
 
 ### Security

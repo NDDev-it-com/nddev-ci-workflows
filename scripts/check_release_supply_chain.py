@@ -29,6 +29,7 @@ REUSABLE = WORKFLOWS_DIR / "release-supply-chain.yml"
 SELF_RELEASE = WORKFLOWS_DIR / "release.yml"
 EXPECTED_STATIC_ASSETS = {
     "sbom.spdx.json",
+    "release-notes.md",
     "release-manifest.json",
     "SHA256SUMS",
 }
@@ -741,10 +742,13 @@ def _check_version_programs(
 def _check_notes_program(program: str, problems: list[str]) -> None:
     with tempfile.TemporaryDirectory(prefix="nddev-release-notes-") as raw_root:
         root = Path(raw_root)
-        notes = root / "release-notes.md"
+        release_dist = root / "release-dist"
+        release_dist.mkdir()
+        notes = release_dist / "release-notes.md"
         env = {
+            "NOTES_FILE": "",
+            "RELEASE_DIST": str(release_dist),
             "RELEASE_VERSION": "1.2.3",
-            "RELEASE_NOTES_PATH": str(notes),
         }
         (root / "CHANGELOG.md").write_text(
             "# Changelog\n\n"
@@ -756,6 +760,8 @@ def _check_notes_program(program: str, problems: list[str]) -> None:
             "next release body\n",
             encoding="utf-8",
         )
+        _init_repo(root)
+        _commit_all(root)
         result = _run_python(program, cwd=root, env=env)
         if result.returncode != 0:
             problems.append(
@@ -775,6 +781,7 @@ def _check_notes_program(program: str, problems: list[str]) -> None:
             if "next release body" in extracted:
                 problems.append("release notes crossed the next changelog heading")
 
+        notes.unlink(missing_ok=True)
         (root / "CHANGELOG.md").write_text(
             "# Changelog\n\n## [1x2y3] - malformed lookalike\n",
             encoding="utf-8",
@@ -783,6 +790,70 @@ def _check_notes_program(program: str, problems: list[str]) -> None:
             problems,
             "release-notes/missing-exact-heading",
             _run_python(program, cwd=root, env=env),
+        )
+
+        (root / "CHANGELOG.md").write_text(
+            "# Changelog\n\n## [1.2.3] - 2026-07-10\n\n   \n"
+            "## [1.2.4] - 2026-07-11\n\nnext\n",
+            encoding="utf-8",
+        )
+        _expect_failure(
+            problems,
+            "release-notes/whitespace-only-changelog-section",
+            _run_python(program, cwd=root, env=env),
+        )
+
+        custom = root / "CUSTOM-NOTES.md"
+        custom.write_text("custom canonical notes\n", encoding="utf-8")
+        _commit_all(root)
+        custom_result = _run_python(
+            program,
+            cwd=root,
+            env=env | {"NOTES_FILE": "CUSTOM-NOTES.md"},
+        )
+        if custom_result.returncode != 0:
+            problems.append(
+                "tracked custom release notes were rejected: "
+                + (custom_result.stderr.strip() or "unknown error")
+            )
+        elif notes.read_text(encoding="utf-8") != "custom canonical notes\n":
+            problems.append("custom notes do not equal the canonical asset")
+
+        notes.unlink(missing_ok=True)
+        untracked = root / "UNTRACKED-NOTES.md"
+        untracked.write_text("untracked\n", encoding="utf-8")
+        _expect_failure(
+            problems,
+            "release-notes/untracked-custom-file",
+            _run_python(
+                program,
+                cwd=root,
+                env=env | {"NOTES_FILE": "UNTRACKED-NOTES.md"},
+            ),
+        )
+
+        empty = root / "EMPTY-NOTES.md"
+        empty.write_text(" \n\t\n", encoding="utf-8")
+        _commit_all(root)
+        _expect_failure(
+            problems,
+            "release-notes/whitespace-only-custom-file",
+            _run_python(
+                program,
+                cwd=root,
+                env=env | {"NOTES_FILE": "EMPTY-NOTES.md"},
+            ),
+        )
+
+        notes.write_text("pre-existing\n", encoding="utf-8")
+        _expect_failure(
+            problems,
+            "release-notes/pre-existing-output",
+            _run_python(
+                program,
+                cwd=root,
+                env=env | {"NOTES_FILE": "CUSTOM-NOTES.md"},
+            ),
         )
 
 
@@ -817,27 +888,27 @@ if args[:1] == ["api"]:
             ["git", "rev-parse", "refs/tags/1.2.3"], cwd=root
         ).stdout.strip()
         archive = release_dist / "fixture-1.2.3.tar.gz"
+        notes = release_dist / "release-notes.md"
         expected_assets = [
             archive,
             release_dist / "sbom.spdx.json",
+            notes,
             release_dist / "release-manifest.json",
             release_dist / "SHA256SUMS",
         ]
         for asset in expected_assets:
             asset.write_text(f"{asset.name}\n", encoding="utf-8")
+        notes.write_text("\nrelease body\n", encoding="utf-8")
         # An undeclared file proves the publish command does not use an open glob.
         (release_dist / "undeclared.txt").write_text("ignore\n", encoding="utf-8")
         calls = root / "gh-calls.jsonl"
-        notes = root / "release-notes.md"
         env = {
             "GH_CALLS": str(calls),
             "GH_TOKEN": "fixture-token",
             "GITHUB_REPOSITORY": "owner/repository",
-            "NOTES_FILE": "",
             "PACKAGE_NAME": "fixture",
             "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}",
             "RELEASE_DIST": str(release_dist),
-            "RELEASE_NOTES_PATH": str(notes),
             "RELEASE_VERSION": "1.2.3",
             "REMOTE_TAG_OBJECT": tag_object,
         }
@@ -848,7 +919,7 @@ if args[:1] == ["api"]:
         )
         if result.returncode != 0:
             problems.append(
-                "publish shell rejected exact four-asset fixture: "
+                "publish shell rejected exact five-asset fixture: "
                 + (result.stderr.strip() or "unknown error")
             )
             return
@@ -878,7 +949,7 @@ if args[:1] == ["api"]:
             ]
             if create_calls[0] != expected_create:
                 problems.append(
-                    "publish shell arguments are not the exact four-asset closure"
+                    "publish shell arguments are not the exact five-asset closure"
                 )
         if notes.read_text(encoding="utf-8") != "\nrelease body\n":
             problems.append("publish shell generated incorrect changelog release notes")
@@ -919,6 +990,9 @@ def _check_asset_program(program: str, problems: list[str]) -> None:
         archive_name = "fixture-1.2.3.tar.gz"
         (release_dist / archive_name).write_bytes(b"archive")
         (release_dist / "sbom.spdx.json").write_text("{}\n", encoding="utf-8")
+        (release_dist / "release-notes.md").write_text(
+            "canonical notes\n", encoding="utf-8"
+        )
         env = {
             "RELEASE_VERSION": "1.2.3",
             "PACKAGE_NAME": "fixture",
@@ -935,13 +1009,14 @@ def _check_asset_program(program: str, problems: list[str]) -> None:
         final_names = {path.name for path in release_dist.iterdir()}
         expected_names = EXPECTED_STATIC_ASSETS | {archive_name}
         if final_names != expected_names:
-            problems.append("release finalizer did not produce exactly four assets")
+            problems.append("release finalizer did not produce exactly five assets")
         manifest = json.loads(
             (release_dist / "release-manifest.json").read_text(encoding="utf-8")
         )
         if manifest.get("required_artifacts") != [
             archive_name,
             "sbom.spdx.json",
+            "release-notes.md",
             "release-manifest.json",
             "SHA256SUMS",
         ]:
@@ -962,7 +1037,12 @@ def _check_asset_program(program: str, problems: list[str]) -> None:
             checksums[name] = digest
         expected_checksums = {
             name: _sha256(release_dist / name)
-            for name in (archive_name, "sbom.spdx.json", "release-manifest.json")
+            for name in (
+                archive_name,
+                "sbom.spdx.json",
+                "release-notes.md",
+                "release-manifest.json",
+            )
         }
         if checksums != expected_checksums:
             problems.append("SHA256SUMS does not cover the exact non-checksum assets")
@@ -971,14 +1051,29 @@ def _check_asset_program(program: str, problems: list[str]) -> None:
         extra_dist.mkdir()
         (extra_dist / archive_name).write_bytes(b"archive")
         (extra_dist / "sbom.spdx.json").write_text("{}\n", encoding="utf-8")
-        (extra_dist / "release-notes.md").write_text("must fail\n", encoding="utf-8")
+        (extra_dist / "release-notes.md").write_text("notes\n", encoding="utf-8")
+        (extra_dist / "undeclared.txt").write_text("must fail\n", encoding="utf-8")
         _expect_failure(
             problems,
-            "asset-closure/unexpected-release-notes",
+            "asset-closure/unexpected-file",
             _run_python(
                 program,
                 cwd=root,
                 env=env | {"RELEASE_DIST": str(extra_dist)},
+            ),
+        )
+
+        missing_notes_dist = root / "release-dist-missing-notes"
+        missing_notes_dist.mkdir()
+        (missing_notes_dist / archive_name).write_bytes(b"archive")
+        (missing_notes_dist / "sbom.spdx.json").write_text("{}\n", encoding="utf-8")
+        _expect_failure(
+            problems,
+            "asset-closure/missing-release-notes",
+            _run_python(
+                program,
+                cwd=root,
+                env=env | {"RELEASE_DIST": str(missing_notes_dist)},
             ),
         )
 
@@ -1021,6 +1116,7 @@ def check() -> list[str]:
         "Build deterministic tracked-source archive",
         "Verify extracted archive payload",
         "Generate SPDX SBOM from exact archive payload (Syft)",
+        "Prepare canonical release notes",
         "Finalize manifest, checksums, and asset closure",
         "Attest build provenance (archive)",
         "Attest SBOM (archive)",
@@ -1171,15 +1267,14 @@ def check() -> list[str]:
     else:
         if "dist/*" in publish_run:
             problems.append("release publishing must not use an open-ended asset glob")
-        if "RELEASE_NOTES_PATH" not in publish_run:
+        if '--notes-file "$RELEASE_DIST/release-notes.md"' not in publish_run:
             problems.append(
-                "generated release notes must remain outside release assets"
+                "GitHub Release body must use the canonical release-notes asset"
             )
-        if "--error-unmatch" not in publish_run or '"$NOTES_FILE"' not in publish_run:
-            problems.append("explicit release notes must be tracked by the release tag")
         for asset in (
             "${PACKAGE_NAME}-${RELEASE_VERSION}.tar.gz",
             "sbom.spdx.json",
+            "release-notes.md",
             "release-manifest.json",
             "SHA256SUMS",
         ):
@@ -1199,8 +1294,10 @@ def check() -> list[str]:
 
     if "step-security/harden-runner@" in reusable_text:
         problems.append("cross-tier release workflow must remain free of Harden-Runner")
-    if "dist/release-notes.md" in reusable_text:
-        problems.append("release notes must not be generated inside release assets")
+    if reusable_text.count('release_dist / "release-notes.md"') != 1:
+        problems.append(
+            "canonical release notes must be materialized once in release-dist"
+        )
 
     try:
         input_program = _embedded_python(
@@ -1219,7 +1316,9 @@ def check() -> list[str]:
         self_version = _embedded_python(
             _step(self_release, "resolve", "Resolve and validate version")
         )
-        notes_program = _embedded_python(publish)
+        notes_program = _embedded_python(
+            _step(reusable, "release", "Prepare canonical release notes")
+        )
     except ValueError as exc:
         problems.append(f"release embedded-program extraction failed: {exc}")
         return problems

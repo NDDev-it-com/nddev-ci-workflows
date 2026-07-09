@@ -2,11 +2,12 @@ name: release-supply-chain
 
 # Reusable release supply-chain hardening for BOTH tiers.
 #
-# Produces, for a numeric tag, exactly four release assets: a deterministic
-# tracked-source archive, an SPDX SBOM of that exact archive payload, a release
-# manifest, and SHA256SUMS. It also emits TWO signed attestations: SLSA build
-# provenance for the archive and an SBOM attestation. It then publishes ONE
-# immutable GitHub Release with every asset attached in a single create call.
+# Produces, for a numeric tag, exactly five release assets: a deterministic
+# tracked-source archive, an SPDX SBOM of that exact archive payload, canonical
+# release notes, a release manifest, and SHA256SUMS. It also emits TWO signed
+# attestations: SLSA build provenance for the archive and an SBOM attestation.
+# It then publishes ONE immutable GitHub Release with every asset attached in a
+# single create call.
 #
 # SLSA note: build provenance generated from inside this reusable workflow meets
 # SLSA v1.0 Build Level 3 (build logic is isolated from the caller).
@@ -36,7 +37,9 @@ on:
         type: string
         default: 'ubuntu-latest'
       notes_file:
-        description: 'Optional path to release notes; extracted from CHANGELOG if empty.'
+        description: >-
+          Optional tracked UTF-8 notes path; a matching non-empty CHANGELOG
+          section is required when empty.
         type: string
         default: ''
 
@@ -494,6 +497,106 @@ jobs:
           rm -rf -- "$syft_archive" "$syft_directory"
           trap - EXIT
 
+      - name: Prepare canonical release notes
+        env:
+          NOTES_FILE: ${{ inputs.notes_file }}
+          RELEASE_DIST: ${{ runner.temp }}/release-dist
+        run: |
+          set -euo pipefail
+          python3 -I <<'PY'
+          import os
+          import pathlib
+          import subprocess
+          import sys
+
+          def fail(message):
+              print(f"release notes: {message}", file=sys.stderr)
+              raise SystemExit(1)
+
+          release_dist = pathlib.Path(os.environ["RELEASE_DIST"])
+          output = release_dist / "release-notes.md"
+          if output.exists() or output.is_symlink():
+              fail("canonical output path already exists")
+
+          notes_file = os.environ["NOTES_FILE"]
+          if notes_file:
+              source = pathlib.Path(notes_file)
+              if source.is_symlink() or not source.is_file():
+                  fail("notes_file must be a regular non-symlink file")
+              tracked = subprocess.run(
+                  [
+                      "git",
+                      "--literal-pathspecs",
+                      "ls-files",
+                      "--error-unmatch",
+                      "--",
+                      notes_file,
+                  ],
+                  check=False,
+                  stdout=subprocess.DEVNULL,
+                  stderr=subprocess.DEVNULL,
+              )
+              if tracked.returncode != 0:
+                  fail("notes_file must be tracked by the release tag")
+              try:
+                  content = source.read_text(encoding="utf-8")
+              except (OSError, UnicodeError) as exc:
+                  fail(f"cannot read notes_file as UTF-8: {exc}")
+          else:
+              changelog = pathlib.Path("CHANGELOG.md")
+              if changelog.is_symlink() or not changelog.is_file():
+                  fail("provide notes_file or a regular CHANGELOG.md")
+              tracked = subprocess.run(
+                  [
+                      "git",
+                      "--literal-pathspecs",
+                      "ls-files",
+                      "--error-unmatch",
+                      "--",
+                      "CHANGELOG.md",
+                  ],
+                  check=False,
+                  stdout=subprocess.DEVNULL,
+                  stderr=subprocess.DEVNULL,
+              )
+              if tracked.returncode != 0:
+                  fail("CHANGELOG.md must be tracked by the release tag")
+              try:
+                  lines = changelog.read_text(encoding="utf-8").splitlines(
+                      keepends=True
+                  )
+              except (OSError, UnicodeError) as exc:
+                  fail(f"cannot read CHANGELOG.md as UTF-8: {exc}")
+              heading = f'## [{os.environ["RELEASE_VERSION"]}]'
+              body = []
+              found = False
+              for line in lines:
+                  text = line.rstrip("\r\n")
+                  if text == heading or text.startswith(heading + " - "):
+                      if found:
+                          fail("CHANGELOG.md contains duplicate release headings")
+                      found = True
+                      continue
+                  if found and text.startswith("## ["):
+                      break
+                  if found:
+                      body.append(line)
+              if not found:
+                  fail("exact changelog heading not found")
+              content = "".join(body)
+
+          if not content.strip():
+              fail("canonical release notes must contain non-whitespace content")
+          try:
+              with output.open("x", encoding="utf-8", newline="\n") as stream:
+                  stream.write(content)
+          except OSError as exc:
+              fail(f"cannot create canonical release notes: {exc}")
+          if output.is_symlink() or not output.is_file() or output.stat().st_size == 0:
+              fail("canonical release notes are not a non-empty regular file")
+          print(f"canonical release notes: {output}")
+          PY
+
       - name: Finalize manifest, checksums, and asset closure
         env:
           RELEASE_DIST: ${{ runner.temp }}/release-dist
@@ -517,8 +620,8 @@ jobs:
           release_dist = Path(os.environ["RELEASE_DIST"])
           archive = f"{package_name}-{version}.tar.gz"
           initial_assets = {path.name for path in release_dist.iterdir()}
-          if initial_assets != {archive, "sbom.spdx.json"}:
-              fail("archive/SBOM staging set is not closed")
+          if initial_assets != {archive, "sbom.spdx.json", "release-notes.md"}:
+              fail("archive/SBOM/release-notes staging set is not closed")
           for asset in initial_assets:
               path = release_dist / asset
               if path.is_symlink() or not path.is_file():
@@ -547,7 +650,11 @@ jobs:
               "source_tag_object": source_tag_object,
               "slsa_build_level": 3,
               "required_artifacts": [
-                  archive, "sbom.spdx.json", "release-manifest.json", "SHA256SUMS",
+                  archive,
+                  "sbom.spdx.json",
+                  "release-notes.md",
+                  "release-manifest.json",
+                  "SHA256SUMS",
               ],
           }
           manifest_path = release_dist / "release-manifest.json"
@@ -555,7 +662,12 @@ jobs:
               json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
           )
 
-          checksum_names = (archive, "sbom.spdx.json", "release-manifest.json")
+          checksum_names = (
+              archive,
+              "sbom.spdx.json",
+              "release-notes.md",
+              "release-manifest.json",
+          )
           checksum_lines = []
           for name in checksum_names:
               digest = hashlib.sha256()
@@ -601,60 +713,13 @@ jobs:
       - name: Publish immutable GitHub Release (single create)
         env:
           GH_TOKEN: ${{ github.token }}
-          NOTES_FILE: ${{ inputs.notes_file }}
           RELEASE_DIST: ${{ runner.temp }}/release-dist
-          RELEASE_NOTES_PATH: ${{ runner.temp }}/release-notes.md
         run: |
           set -euo pipefail
-          if [ -z "$NOTES_FILE" ] && [ -f CHANGELOG.md ]; then
-            python3 -I <<'PY'
-          import os
-          import pathlib
-          import sys
-
-          version = os.environ["RELEASE_VERSION"]
-          heading = f"## [{version}]"
-          try:
-              lines = pathlib.Path("CHANGELOG.md").read_text(
-                  encoding="utf-8"
-              ).splitlines(keepends=True)
-          except OSError as exc:
-              print(f"release notes: cannot read CHANGELOG.md: {exc}", file=sys.stderr)
-              raise SystemExit(1)
-          body = []
-          found = False
-          for line in lines:
-              text = line.rstrip("\r\n")
-              if text == heading or text.startswith(heading + " - "):
-                  found = True
-                  continue
-              if found and text.startswith("## ["):
-                  break
-              if found:
-                  body.append(line)
-          if not found:
-              print("release notes: exact changelog heading not found", file=sys.stderr)
-              raise SystemExit(1)
-          pathlib.Path(os.environ["RELEASE_NOTES_PATH"]).write_text(
-              "".join(body), encoding="utf-8"
-          )
-          PY
-            NOTES_FILE="$RELEASE_NOTES_PATH"
-          elif [ -n "$NOTES_FILE" ]; then
-            if [ -L "$NOTES_FILE" ] || [ ! -f "$NOTES_FILE" ]; then
-              echo "notes_file must be a regular non-symlink file" >&2
-              exit 1
-            fi
-            if ! git --literal-pathspecs ls-files --error-unmatch \
-              -- "$NOTES_FILE" >/dev/null 2>&1; then
-              echo "notes_file must be tracked by the release tag" >&2
-              exit 1
-            fi
-          fi
-
           assets=(
             "$RELEASE_DIST/${PACKAGE_NAME}-${RELEASE_VERSION}.tar.gz"
             "$RELEASE_DIST/sbom.spdx.json"
+            "$RELEASE_DIST/release-notes.md"
             "$RELEASE_DIST/release-manifest.json"
             "$RELEASE_DIST/SHA256SUMS"
           )
@@ -669,10 +734,8 @@ jobs:
             release create "$RELEASE_VERSION"
             --verify-tag
             --title "$RELEASE_VERSION"
+            --notes-file "$RELEASE_DIST/release-notes.md"
           )
-          if [ -n "$NOTES_FILE" ]; then
-            release_args+=(--notes-file "$NOTES_FILE")
-          fi
           release_args+=("${assets[@]}")
           local_tag_object="$(git rev-parse --verify "refs/tags/${RELEASE_VERSION}")"
           local_tag_commit="$(git rev-parse --verify "refs/tags/${RELEASE_VERSION}^{commit}")"

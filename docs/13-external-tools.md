@@ -11,7 +11,7 @@ container images, checksum for downloaded binaries).
 | **zizmor** | GitHub Actions security static analysis (template injection, cred persistence, excessive perms, impostor refs) | Both | `zizmor-sarif.yml`, `zizmor-no-sarif.yml` |
 | **gitleaks** | Secret detection across working tree + full git history | Both | `secret-scan.yml` |
 | **trivy** | Vulnerability + misconfig scanning for containers, images, IaC, and deps | Both | `container-ci.yml` |
-| **syft** | SBOM generation (SPDX / CycloneDX) — via `anchore/sbom-action` | Both | `release-supply-chain.yml` |
+| **syft** | SBOM generation (SPDX / CycloneDX) — checksum-pinned CLI archive | Both | `release-supply-chain.yml` |
 | **grype** | Vulnerability scanning of SBOMs / images | Both | `container-ci.yml` (optional) |
 | **osv-scanner** | Dependency vulnerabilities from the OSV database across lockfiles | Both | `private-static.yml` command |
 | **semgrep** | Multi-language SAST with custom rules | Both | `private-static.yml` command |
@@ -31,8 +31,9 @@ container images, checksum for downloaded binaries).
   so matched secrets are never printed.
 - **trivy / grype / hadolint** — the container lane's scanners; trivy also
   covers IaC and dependencies. Emit SARIF for upload on public/GHAS.
-- **syft** — the SBOM engine behind `anchore/sbom-action` (`format:
-  spdx-json`); its output feeds `attest-sbom` (see
+- **syft** — version 1.42.3 is downloaded directly for Linux AMD64/ARM64 and
+  verified against a pinned byte size and SHA-256 before producing SPDX-JSON;
+  its output feeds the SBOM attestation (see
   [07 Supply chain](07-supply-chain-slsa-sbom-attestations.md#generating-the-sbom)).
 - **osv-scanner / semgrep** — drop into `private-static.yml` as the `command`
   for zero-cost private SAST/dependency scanning.
@@ -49,4 +50,4 @@ container images, checksum for downloaded binaries).
 | Downloaded binary | version + SHA256 checksum verify | manual |
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

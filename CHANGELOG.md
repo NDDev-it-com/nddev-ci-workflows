@@ -2,6 +2,73 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-10
+
+### Security
+
+- Build source archives from a normalized, literal Git-index expansion of the
+  caller's selected paths. Empty, unmatched, absolute, traversing,
+  non-normalized, duplicate, option-like, control-character, dirty-worktree,
+  symlink, submodule, and other non-regular Git entries now fail closed.
+- Feed GNU tar a sorted NUL-delimited tracked-file list with verbatim option
+  handling and recursion disabled. Untracked directory contents and tar/pathspec
+  injection can no longer enter a release archive.
+- Validate strict numeric SemVer before the untrusted input can reach checkout,
+  then check out the exact requested tag and revalidate its LF-terminated
+  one-line `VERSION`, optional tracked changelog heading, tag context, safe
+  package basename, source tag object, and peeled commit identity.
+- Run every embedded Python release guard with isolated mode (`python3 -I`) so
+  caller-controlled `PYTHONPATH`, site customization, or standard-library
+  shadow modules cannot hijack release logic.
+- Replace `anchore/sbom-action` with a direct Syft 1.42.3 binary download whose
+  Linux AMD64/ARM64 archive size and SHA-256 are pinned in the workflow. No
+  mutable remote installer executes in the privileged release job.
+
+### Fixed
+
+- Generate changelog-derived release notes in runner temporary storage and
+  publish an explicit four-item asset array. `release-notes.md` is no longer an
+  undeclared fifth immutable release asset omitted from the manifest and
+  checksums.
+- Match changelog headings literally and require exactly one version section;
+  dotted versions can no longer behave as regular expressions or select an
+  ambiguous duplicate section.
+- Build the archive before SBOM generation, extract that exact archive into a
+  private runner-temporary payload, and scan only that payload. The SPDX SBOM
+  can no longer describe caller files that are absent from the source archive.
+- Generate `release-manifest.json` and `SHA256SUMS` from explicit asset names,
+  require the final directory to equal the manifest closure, and reject
+  symlinked or non-regular release assets.
+- Revalidate the remote tag object immediately before publication and record
+  both the source tag object and peeled source commit in the release manifest.
+
+### Added
+
+- Add a `validate_all.py` release-supply-chain gate that extracts and executes
+  the workflow's exact embedded guards against positive and adversarial
+  fixtures for archive selection, extracted-payload closure, strict versions,
+  isolated Python, pinned Syft architecture selection, exact publish arguments,
+  asset closure, manifest contents, and checksum coverage.
+
+### Changed
+
+- Make the library's own custom source archive complete: workflows, rulesets,
+  catalog, generated and authored docs, examples, validators, locked validation
+  dependencies, community files, and the root ignore boundary are all selected
+  from the exact tag's tracked state.
+- Remove the former `sbom_source_path` input. Syft now always scans the exact
+  extracted archive payload, and release runners are explicitly limited to
+  Linux X64/ARM64 because the deterministic archive contract requires GNU tar.
+
+### Migration
+
+- Update callers pinned to an older release before adopting `0.5.0`: remove
+  `sbom_source_path`, ensure `VERSION` is one LF-terminated numeric SemVer line,
+  use only normalized tracked regular-file selections in `archive_paths`, keep
+  an explicit `notes_file` tracked and regular, and select a Linux X64/ARM64
+  runner. These intentionally incompatible contract changes require a minor
+  release rather than a patch release.
+
 ## [0.4.0] - 2026-07-10
 
 ### Security

@@ -59,8 +59,11 @@ permissions:
 
 Two supported paths:
 
-1. **`anchore/sbom-action`** with `format: spdx-json` — scans the build and
-   emits an SPDX-JSON SBOM suitable for `attest-sbom`.
+1. **Checksum-pinned Syft CLI** — the release reusable downloads the exact
+   Syft 1.42.3 Linux AMD64/ARM64 archive, verifies its pinned byte size and
+   SHA-256, and scans a private extraction of the tracked-source archive. It
+   emits SPDX-JSON suitable for attestation and never executes a remote
+   installer or scans the wider checkout.
 2. **Dependency-graph SBOM export API** — for the repository's *declared*
    dependencies:
 
@@ -68,14 +71,15 @@ Two supported paths:
 gh api /repos/{owner}/{repo}/dependency-graph/sbom > sbom.spdx.json
 ```
 
-The API returns SPDX-JSON of declared dependencies; `anchore/sbom-action`
-inspects actual build contents. Use the API for a dependency inventory and
-`sbom-action` for a build-artifact SBOM.
+The API returns SPDX-JSON of declared dependencies; the checksum-pinned Syft
+CLI inspects actual build contents. Use the API for a dependency inventory and
+the pinned Syft path for a build-artifact SBOM.
 
 ## SHA256SUMS
 
-Alongside the archive and SBOM, the release publishes `SHA256SUMS` so consumers
-can verify byte integrity independently of Sigstore:
+Alongside the archive, SBOM, and manifest, the release publishes `SHA256SUMS`
+covering those other three assets so consumers can verify byte integrity
+independently of Sigstore:
 
 ```bash
 sha256sum -c SHA256SUMS
@@ -124,17 +128,26 @@ assets cannot be modified, deleted, or clobbered.** This changes how you publish
 
 ```bash
 # One-shot create with all assets; fails if the tag's release already exists
+release_dist="${RUNNER_TEMP}/release-dist"
+release_notes="${RUNNER_TEMP}/release-notes.md"
 gh release create "$VERSION" \
   --verify-tag \
   --title "$VERSION" \
-  --notes-file dist/release-notes.md \
-  dist/*
+  --notes-file "$release_notes" \
+  "$release_dist/my-app-${VERSION}.tar.gz" \
+  "$release_dist/sbom.spdx.json" \
+  "$release_dist/release-manifest.json" \
+  "$release_dist/SHA256SUMS"
 ```
 
 ```bash
 # Or: draft → attach → publish
 gh release create "$VERSION" --draft --verify-tag --title "$VERSION"
-gh release upload "$VERSION" dist/*
+gh release upload "$VERSION" \
+  "$release_dist/my-app-${VERSION}.tar.gz" \
+  "$release_dist/sbom.spdx.json" \
+  "$release_dist/release-manifest.json" \
+  "$release_dist/SHA256SUMS"
 gh release edit "$VERSION" --draft=false
 ```
 
@@ -146,14 +159,21 @@ See [09 Releases & packages](09-releases-packages.md) for the tag-driven flow.
 
 ## The release-supply-chain job at a glance
 
-1. Harden runner + checkout (`fetch-depth: 0`, `persist-credentials: false`).
-2. Validate version equals the tag and the `VERSION` file.
-3. Build a **deterministic** `tar.gz` (`--sort=name`, fixed `--mtime`, numeric
-   owner) so the archive is reproducible.
-4. Emit `release-manifest.json` and an SPDX `sbom.spdx.json`.
-5. Compute `SHA256SUMS`.
+1. Validate strict numeric SemVer, a safe package name, and a supported Linux
+   X64/ARM64 runner before the version input reaches checkout.
+2. Check out the exact requested tag without persisted Git credentials, then
+   revalidate its one-line `VERSION`, tag context, and tracked changelog
+   heading, requiring exactly one match.
+3. Expand normalized regular-file selections through literal
+   `git ls-files -z` and build a deterministic `tar.gz` from the option-safe NUL
+   list.
+4. Extract that archive privately, verify its file/digest closure, and generate
+   the SPDX SBOM from only that exact payload with checksum-pinned Syft.
+5. Emit `release-manifest.json` with source tag/commit identity, compute
+   `SHA256SUMS`, and require exactly the four declared regular assets.
 6. Attest the archive and the SBOM (Sigstore keyless).
-7. Publish the immutable GitHub Release with all assets.
+7. Revalidate the remote tag object and publish those four assets in one
+   immutable create call; notes stay metadata.
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

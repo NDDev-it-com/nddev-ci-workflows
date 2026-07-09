@@ -34,9 +34,10 @@ turning it on for private repos, where it is billed per active committer.
    enterprise level.
 2. Enable **Code scanning**, **Dependency graph**, **Dependency review**, and
    **Secret scanning + push protection** under **Settings → Code security**.
-3. Add the reusable callers you need, using the public-tier examples but keeping
-   `enable_harden_runner` / SARIF upload **on** (they are now paid-for and
-   supported).
+3. Add the public/GHAS reusable callers you need. SARIF workflows are selected
+   explicitly rather than enabled through a boolean toggle.
+4. If you also want Harden-Runner in a private repository, purchase the separate
+   StepSecurity Enterprise plan; GHAS does not include that service.
 
 ```yaml
 # private repo WITH GHAS — same callers as public
@@ -85,4 +86,4 @@ scanning, `zizmor-no-sarif.yml` instead of SARIF-backed code scanning, and
 `private-static.yml` for validation.
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

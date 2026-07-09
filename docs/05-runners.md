@@ -75,10 +75,14 @@ from a job, catching exfiltration and unexpected outbound calls.
       api.github.com:443
 ```
 
-harden-runner is **free on public repos and paid on private repos**. Dual-tier
-reusables expose `enable_harden_runner` (and some an `egress_policy` input); set
-`enable_harden_runner: false` on private-free callers. Recommended progression:
-`audit` → review the observed endpoints → `block` with an explicit allow-list.
+Harden-Runner is **free on public repos and paid on private repos**. The library
+therefore references it only from explicit public/GHAS workflows. Cross-tier
+and private-free workflows contain no action reference at all. A step-level
+boolean is not a valid off switch because JavaScript actions can have `pre` and
+`post` hooks whose lifecycle is independent of the main-step condition.
+
+Recommended progression: `audit` → review the observed endpoints → `block`
+with an explicit allow-list.
 
 <a id="self-hosted"></a>
 ## Self-hosted runners and ARC
@@ -96,4 +100,4 @@ you own patching, isolation, and security.
   features do not all apply to self-hosted.
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

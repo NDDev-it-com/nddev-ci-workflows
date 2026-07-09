@@ -2,8 +2,27 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-10
+
+### Security
+
+- Remove the unsafe `enable_harden_runner` step toggle. Harden-Runner's
+  JavaScript `pre` and `post` hooks can execute even when the main step's `if`
+  condition is false, so cross-tier and private-free workflows now contain no
+  StepSecurity action reference.
+- Add a fail-closed validator that restricts Harden-Runner to explicit
+  public/GHAS workflows, requires it to be unconditional and first in its job,
+  and rejects regressions to the legacy toggle contract.
+- Update the remaining public/GHAS Harden-Runner references to v2.20.0 at the
+  audited full commit SHA.
+- Compile the validator dependency set with complete distribution hashes and
+  require hash verification in self-CI.
+
 ### Changed
 
+- Make the public/GHAS versus private-free billing boundary structural rather
+  than caller-configured. This is a breaking input-contract change for callers
+  that passed `enable_harden_runner`; remove that input when updating the pin.
 - Migrate the SBOM attestation from the deprecated `actions/attest-sbom` to
   `actions/attest` (native SBOM mode via `sbom-path`, an identical interface).
   The SPDX predicate type and `scripts/verify_attestations.sh` verification are

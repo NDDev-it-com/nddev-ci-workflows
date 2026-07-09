@@ -7,7 +7,7 @@ across the NDDev estate by full commit SHA. Here is where to get help.
 
 - **[README](README.md)** — the capability tiers table (public / private-free),
   per-workflow usage snippets, and the common inputs
-  (`enable_harden_runner`, `upload_sarif`, `egress_policy`, `runner`).
+  (`upload_sarif`, `egress_policy`, `runner`).
 - **Workflow header comments** — each reusable workflow documents its own inputs
   and behavior at the top of its file in `.github/workflows/`.
 - **`docs/`** — deeper reference material and the workflow catalog, when present.
@@ -40,7 +40,8 @@ Public issues are disabled in favor of structured forms. Pick the one that fits:
 If you want to send a change, read [CONTRIBUTING.md](CONTRIBUTING.md) for the
 non-negotiable requirements every workflow PR must satisfy (full-SHA pins,
 least-privilege permissions, concurrency, timeouts, no template injection,
-dual-tier toggles) and the local checks to run.
+and explicit public/GHAS versus private-free boundaries) and the local checks
+to run.
 
 ## Scope of support
 

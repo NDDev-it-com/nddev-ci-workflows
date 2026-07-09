@@ -1,5 +1,4 @@
 # Docs CI (broken relative-link check) caller (any tier). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: docs
 on:
   push: { branches: [main] }

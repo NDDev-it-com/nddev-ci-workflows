@@ -46,8 +46,8 @@ that is more than `contents: read`. Example:
 - [ ] `persist-credentials: false` on all read-only `actions/checkout` steps.
 - [ ] No `${{ inputs.* }}` / `${{ github.event.* }}` interpolated inside `run:`
       (passed via `env:` and referenced as shell variables).
-- [ ] Dual-tier toggles (`enable_harden_runner` / `upload_sarif`) preserved for
-      capabilities that are paid on private repos.
+- [ ] Paid public/GHAS actions are absent from private-free/cross-tier files;
+      SARIF/no-SARIF behavior is split into explicit workflow contracts.
 - [ ] `actionlint` passes locally.
 - [ ] `zizmor --pedantic` passes locally (no `template-injection` or unpinned
       findings).

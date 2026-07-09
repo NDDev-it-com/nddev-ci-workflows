@@ -1,5 +1,4 @@
 # Python CI caller (any tier). Replace @<sha> with a pinned full commit SHA.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: python
 on:
   push: { branches: [main] }

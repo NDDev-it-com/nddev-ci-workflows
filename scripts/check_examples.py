@@ -69,8 +69,11 @@ def check() -> list[str]:
             text = path.read_text(encoding="utf-8")
             if "zizmor-no-sarif.yml" not in text:
                 problems.append(f"{rel}: private-free security must use zizmor-no-sarif.yml")
-            if "enable_harden_runner: false" not in text:
-                problems.append(f"{rel}: private-free harden-runner callers must disable harden-runner")
+            if "enable_harden_runner" in text:
+                problems.append(
+                    f"{rel}: private-free callers must use workflows that contain "
+                    "no Harden-Runner action, not the unsafe legacy step toggle"
+                )
         if rel.endswith("dependency-review.yml") and events != {"pull_request"}:
             problems.append(f"{rel}: dependency-review example must use pull_request only")
     return problems

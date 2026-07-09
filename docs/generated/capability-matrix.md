@@ -65,7 +65,7 @@
 | Dependabot version and security updates (`dependabot`) | supply-chain | ga | free | free | available | `-` | `-` |
 | Dependency review (`dependency-review`) | supply-chain | ga | free | unavailable | available | `.github/workflows/public-dependency-review.yml` | `examples/public-oss/dependency-review.yml` |
 | Grype vulnerability scan (`grype-sca`) | supply-chain | ga | free | free | available | `.github/workflows/grype-scan.yml` | `examples/security/grype-scan.yml` |
-| StepSecurity Harden-Runner egress control (`harden-runner`) | supply-chain | ga | free | conditional | conditional | `-` | `-` |
+| StepSecurity Harden-Runner egress control (`harden-runner`) | supply-chain | ga | free | unavailable | available | `-` | `-` |
 | Open source license compliance (`license-compliance-preview`) | supply-chain | preview | unavailable | unavailable | conditional | `-` | `-` |
 | OSV-Scanner SCA (`osv-scanner-sca`) | supply-chain | ga | free | free | available | `.github/workflows/osv-scan.yml` | `examples/security/osv-scan.yml` |
 | SBOM generation (`sbom-generation`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |

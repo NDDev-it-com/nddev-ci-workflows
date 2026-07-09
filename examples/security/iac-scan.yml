@@ -1,5 +1,4 @@
 # Checkov IaC scan caller (any tier). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: iac-scan
 on:
   push: { branches: [main] }

@@ -1,5 +1,4 @@
 # Grype SCA caller (any tier — free on private-free). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: grype-scan
 on:
   push: { branches: [main] }

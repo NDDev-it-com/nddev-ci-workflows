@@ -56,9 +56,9 @@ The library ships two callers:
 | `zizmor-no-sarif.yml` | Runs zizmor, **fails the job** on findings, no upload | Private-free |
 
 Inputs (both): `persona` (`regular` default, `pedantic`, `auditor`),
-`min_severity` (default `low`), `target`, `enable_harden_runner`. The `sarif`
-variant additionally uploads to code scanning and needs `security-events:
-write`.
+`min_severity` (default `low`), and `target`. The `sarif` variant additionally
+uses Harden-Runner, uploads to code scanning, and needs
+`security-events: write`; the no-SARIF variant contains neither paid feature.
 
 > This repository's own `ci.yml` runs zizmor with the **default `regular`
 > persona** against its own workflows.
@@ -94,4 +94,4 @@ All three can emit SARIF for upload on public/GHAS repos. See
 [13 External tools](13-external-tools.md).
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

@@ -1,5 +1,4 @@
 # Cross-platform smoke test caller (any tier). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: cross-platform
 on:
   push: { branches: [main] }

@@ -1,6 +1,6 @@
 name: qt-ci
 
-# Reusable Qt (C++) CI for BOTH tiers: harden-runner, pinned install-qt-action
+# Reusable Qt (C++) CI for BOTH tiers: pinned install-qt-action
 # (aqtinstall) with cache, optional ccache, and caller-provided
 # configure/build/test commands passed via env. Defaults target a CMake project.
 
@@ -51,9 +51,6 @@ on:
         description: 'Test command (bash). Empty to skip.'
         type: string
         default: 'ctest --test-dir build --output-on-failure'
-      enable_harden_runner:
-        type: boolean
-        default: true
       timeout_minutes:
         type: number
         default: 40
@@ -75,12 +72,6 @@ jobs:
       run:
         working-directory: ${{ inputs.working_directory }}
     steps:
-      - name: Harden runner
-        if: ${{ inputs.enable_harden_runner }}
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411  # v2.19.4
-        with:
-          egress-policy: audit
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

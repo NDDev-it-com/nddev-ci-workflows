@@ -3,7 +3,8 @@
 This page documents the reusable packs added in the July 2026 expansion. Every
 pack follows the library conventions (top-level `permissions: {}`, SHA-pinned
 actions with version comments, env-indirected caller commands, `timeout-minutes`,
-harden-runner gating) and is validated by `scripts/validate_all.py`. The
+and an explicit private-free-safe action surface) and is validated by
+`scripts/validate_all.py`. The
 machine-readable source of truth is
 [`catalog/capabilities.yml`](../catalog/capabilities.yml); the full matrix is in
 [generated/capability-matrix.md](generated/capability-matrix.md).
@@ -11,8 +12,8 @@ machine-readable source of truth is
 Tier legend: **Public** = free on public repos; **Private-free** = free on
 private repos (no paid GHAS); **Private-paid** = available with GHAS. Language
 build packs consume metered runner minutes on private repos (marked
-*conditional* in the catalog) but need no paid feature. Private-free callers set
-`enable_harden_runner: false` — harden-runner is a Linux/paid feature on private.
+*conditional* in the catalog) but need no paid feature. They contain no
+Harden-Runner reference, so private callers do not need a disable toggle.
 
 ## Language packs
 
@@ -31,7 +32,7 @@ Dual-tier, caller-command-driven with sensible defaults.
 
 These join the existing Python, Node, Go, Rust, Java, .NET, container, and
 Terraform packs. Swift defaults to a macOS runner (10x minute multiplier); its
-harden-runner step and SwiftLint run on the appropriate OS only.
+SwiftLint step runs on macOS only.
 
 ## Quality gates
 
@@ -74,4 +75,4 @@ wrap fast-moving third-party services and are opt-in.
 | Release automation | [release-please](../examples/level3/release-please.yml) | Complements the tag-driven attested release; changesets for monorepos. |
 
 ---
-Last verified: 2026-07-08
+Last verified: 2026-07-10

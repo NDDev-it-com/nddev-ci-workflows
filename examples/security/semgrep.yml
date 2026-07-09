@@ -1,5 +1,4 @@
 # Semgrep OSS SAST caller (any tier — free on private-free). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: semgrep
 on:
   push: { branches: [main] }

@@ -138,11 +138,9 @@ jobs:
   secret-scan:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/secret-scan.yml@<sha>
-    with: { enable_harden_runner: false }
   actionlint:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/actionlint.yml@<sha>
-    with: { enable_harden_runner: false }
   zizmor:
     permissions: { contents: read }   # no security-events: write — least privilege
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/zizmor-no-sarif.yml@<sha>
@@ -178,13 +176,17 @@ attestation, and an SBOM attestation (SLSA v1.0 Build L3). Verify with
 ## Common inputs
 
 - `runner` — runner label (default `ubuntu-latest`).
-- `enable_harden_runner` — dual-tier hardening toggle (`true` public; `false` on
-  private where harden-runner is paid).
 - `upload_sarif` (zizmor) — split into `zizmor-sarif.yml` (uploads) and
   `zizmor-no-sarif.yml` (least privilege; no `security-events: write`).
 - `egress_policy` — `audit` (default) or `block` for harden-runner.
 
 Each workflow documents its full input set in its header comment.
+
+Harden-Runner is present only in explicitly public/GHAS workflows and is
+unconditional there. Cross-tier and private-free workflows contain no
+Harden-Runner reference. This file-level separation is intentional: the action
+has `pre` and `post` entry points that GitHub can execute even when a step-level
+`if` evaluates to false, so a boolean toggle is not a safe disable mechanism.
 
 ## Governance
 

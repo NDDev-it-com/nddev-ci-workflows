@@ -23,7 +23,7 @@ body:
     attributes:
       label: Current pin
       description: The SHA / digest / checksum currently pinned, and its version comment.
-      placeholder: "e.g. step-security/harden-runner@9af89fc...  # v2.19.4"
+      placeholder: "e.g. step-security/harden-runner@bf7454d...  # v2.20.0"
     validations:
       required: true
   - type: input

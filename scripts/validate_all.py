@@ -26,6 +26,7 @@ import check_permissions
 import check_pinned_actions
 import check_docs_links
 import check_examples
+import check_harden_runner_contract
 import check_merge_group
 import check_rulesets
 import check_workflow_contracts
@@ -36,6 +37,7 @@ CHECKS = [
     ("pinned-actions", check_pinned_actions.check),
     ("permissions", check_permissions.check),
     ("workflow-contracts", check_workflow_contracts.check),
+    ("harden-runner-contract", check_harden_runner_contract.check),
     ("examples", check_examples.check),
     ("docs-links", check_docs_links.check),
     ("merge-group", check_merge_group.check),

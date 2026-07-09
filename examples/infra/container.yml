@@ -1,5 +1,4 @@
 # Container/filesystem Trivy scan caller (any tier). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: container
 on:
   push: { branches: [main] }

@@ -58,7 +58,7 @@ body:
     attributes:
       label: Design constraints acknowledged
       options:
-        - label: Any capability that is paid on private repos must expose enable_harden_runner / upload_sarif toggles.
+        - label: Paid public/GHAS capabilities must be separated from private-free workflows at the file boundary.
           required: true
         - label: I searched existing issues and workflows for overlap.
           required: true

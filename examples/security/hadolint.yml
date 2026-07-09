@@ -1,5 +1,4 @@
 # hadolint Dockerfile lint caller (any tier). Replace @<sha>.
-# Private-free callers add `with: { enable_harden_runner: false }`.
 name: hadolint
 on:
   push: { branches: [main] }

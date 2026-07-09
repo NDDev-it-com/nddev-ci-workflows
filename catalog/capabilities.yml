@@ -373,12 +373,12 @@ capabilities:
     required_settings:
       - "Dependency graph enabled for the dependency-graph SBOM API (GET /repos/{owner}/{repo}/dependency-graph/sbom)"
     risks:
-      - "actions/attest (SBOM mode) requires SPDX or CycloneDX JSON; anchore/sbom-action is configured for spdx-json"
+      - "actions/attest (SBOM mode) requires SPDX or CycloneDX JSON; checksum-pinned Syft is configured for spdx-json"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-10"
     sources:
       - "https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/exporting-a-software-bill-of-materials-for-your-repository"
-      - "https://github.com/anchore/sbom-action"
+      - "https://github.com/anchore/syft"
 
   - id: slsa-build-provenance
     name: SLSA build provenance

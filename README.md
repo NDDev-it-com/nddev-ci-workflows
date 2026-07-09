@@ -173,6 +173,30 @@ attestation, and an SBOM attestation (SLSA v1.0 Build L3). Verify with
 [`scripts/verify_attestations.sh`](scripts/verify_attestations.sh). See
 [`docs/07-supply-chain-slsa-sbom-attestations.md`](docs/07-supply-chain-slsa-sbom-attestations.md).
 
+Release versions are strict numeric SemVer (`X.Y.Z`, no leading zeros), and
+`VERSION` must contain that value as one LF-terminated line. `archive_paths`
+accepts normalized relative selections and expands each through the literal Git
+index: only tracked files enter the archive, even when a selected directory
+contains untracked output. Symlinks, submodules, and non-regular entries are
+rejected. The reusable validates input syntax before checkout, checks out the
+exact tag, and revalidates that tag's `VERSION` and tracked changelog heading.
+The release version must have exactly one matching changelog heading.
+The SBOM scans the exact extracted archive payload. Every release publishes
+exactly four assets: the archive, `sbom.spdx.json`, `release-manifest.json`, and
+`SHA256SUMS`; release notes remain release metadata, not an asset. Syft 1.42.3
+is downloaded directly for Linux X64/ARM64 runners and verified against pinned
+archive size and SHA-256 before execution; no remote installer script runs. The
+manifest records the source tag object and peeled commit, and the remote tag is
+revalidated immediately before publication.
+
+### Migrating release callers to 0.5.0
+
+Remove the former `sbom_source_path` input, use a Linux X64/ARM64 runner, and
+make every `archive_paths` selection a normalized relative tracked path whose
+expansion contains regular files only. `VERSION` is mandatory and exact, and an
+explicit `notes_file` must be a tracked regular non-symlink file. These are
+intentional fail-closed changes from the 0.4.x contract.
+
 ## Common inputs
 
 - `runner` — runner label (default `ubuntu-latest`).

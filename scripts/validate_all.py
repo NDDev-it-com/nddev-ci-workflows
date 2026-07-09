@@ -8,6 +8,7 @@ Checks:
   - pinned actions (full-SHA + version comment)
   - least-privilege permissions + timeouts
   - reusable-workflow contract
+  - release supply-chain asset/archive/version contract
   - copy-paste example contract
   - Markdown local link health
   - merge_queue / merge_group trigger compatibility
@@ -15,6 +16,7 @@ Checks:
   - capability catalog schema
   - generated docs drift
 """
+
 from __future__ import annotations
 
 import sys
@@ -24,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import check_permissions
 import check_pinned_actions
+import check_release_supply_chain
 import check_docs_links
 import check_examples
 import check_harden_runner_contract
@@ -38,6 +41,7 @@ CHECKS = [
     ("permissions", check_permissions.check),
     ("workflow-contracts", check_workflow_contracts.check),
     ("harden-runner-contract", check_harden_runner_contract.check),
+    ("release-supply-chain", check_release_supply_chain.check),
     ("examples", check_examples.check),
     ("docs-links", check_docs_links.check),
     ("merge-group", check_merge_group.check),

@@ -78,10 +78,13 @@ version-controlled and reviewable.
 | Block force-push (`non_fast_forward`) | No history rewrite |
 | Block deletion | Protect the branch |
 
-This mirrors the current `main` protection: signed commits, required review +
-code-owner review, linear history, no force-push/deletion, and the `ci-gate`
-check (see [SECURITY.md](../SECURITY.md) and `.github/CODEOWNERS`). `ci-gate` is
-the aggregate gate job in `ci.yml`.
+This is the recommended multi-maintainer baseline. This repository's live
+solo-maintainer variant still requires a pull request, squash-only merge,
+resolved review threads, signed commits, linear history, no
+force-push/deletion, and the strict `ci-gate` check, but sets approvals to zero
+because GitHub does not allow an author to approve their own pull request.
+Projects with an independent reviewer should use the recommendation above.
+`ci-gate` is the aggregate gate job in `ci.yml`.
 
 ## Tag rulesets
 
@@ -142,4 +145,4 @@ These run on the push itself, catching mistakes earlier than a PR check.
   compliance check results before merge once policy false-positives are known.
 
 ---
-Last verified: 2026-07-04
+Last verified: 2026-07-10

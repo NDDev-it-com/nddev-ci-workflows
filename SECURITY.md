@@ -30,8 +30,10 @@ response as soon as reasonably possible.
 - `check_harden_runner_contract.py` rejects conditional Harden-Runner steps and
   any paid runtime-hardening reference in cross-tier/private-free workflows.
 - `main` is protected by a repository ruleset (`.github/rulesets/branch-main.json`):
-  signed commits, required review + code-owner review, linear history, no
-  force-push or deletion, and the `ci-gate` status check. Release tags are
+  pull-request-only squash merges, resolved review threads, signed commits,
+  linear history, no force-push or deletion, and the strict `ci-gate` status
+  check. The solo-maintainer repository does not require self-approval. Release
+  tags are
   protected by `.github/rulesets/tag-semver.json`.
 - Releases are tag-driven and immutable, and ship an SPDX SBOM, SHA256SUMS, a
   build-provenance attestation, and an SBOM attestation (SLSA v1.0 Build L3,

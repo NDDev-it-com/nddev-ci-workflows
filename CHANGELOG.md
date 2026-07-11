@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-07-11
+
 ### Fixed
 
 - **Grant `artifact-metadata: write` to the attesting release jobs.**

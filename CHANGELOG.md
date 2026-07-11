@@ -2,6 +2,32 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-12
+
+### Added
+
+- **`release-supply-chain.yml` optional `runtime_paths`.** When set, the
+  workflow builds a second deterministic, minimal runtime bundle from the
+  selected tracked paths (reproducible tar assembled from Git blobs; executable
+  bits preserved; symlinks and non-regular entries rejected), includes it in
+  the release manifest, `SHA256SUMS`, and the single immutable release-create
+  call, and attests its build provenance alongside the source archive. Empty
+  (default) leaves every existing asset, checksum, and attestation
+  byte-for-byte unchanged, so current callers are unaffected. (RVR-P3-001)
+
+### Fixed
+
+- **`monorepo-changed-paths` rejects `pull_request_target`.** Under that
+  privileged event GitHub checks out the base branch rather than the PR, so
+  the git-diff router saw none of the proposed changes and returned a green
+  all-false — silently skipping every gated test, scan, build, or migration.
+  The router now hard-fails on `pull_request_target` (before any base
+  resolution, and regardless of an explicit `base_ref`) with a message
+  pointing callers to `pull_request`; checking out fork code to work around
+  it is unsafe and intentionally not offered. `check_monorepo_routing.py`
+  gains negative fixtures proving both the payload-base and explicit-base
+  forms fail closed. (RVR-P2-005)
+
 ## [0.6.0] - 2026-07-11
 
 ### Added

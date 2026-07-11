@@ -305,6 +305,26 @@ def check() -> list[str]:
             "pull-request/missing-base",
             _route(program, linear, scratch, two_groups, EVENT_NAME="pull_request"),
         )
+        # pull_request_target must be rejected even with a resolvable base and a
+        # valid explicit base_ref: under that event GitHub checks out the base
+        # branch, so the router can never see the PR and must never report a
+        # green all-false. Both forms fail closed.
+        _expect_failure(
+            problems,
+            "pull-request-target/valid-base-still-rejected",
+            _route(
+                program, linear, scratch, two_groups,
+                EVENT_NAME="pull_request_target", PR_BASE_SHA=c0,
+            ),
+        )
+        _expect_failure(
+            problems,
+            "pull-request-target/explicit-base-ref-still-rejected",
+            _route(
+                program, linear, scratch, two_groups,
+                EVENT_NAME="pull_request_target", BASE_REF=c0,
+            ),
+        )
         _expect_result(
             problems,
             "merge-group/base-sha",

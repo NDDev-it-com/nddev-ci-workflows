@@ -16,6 +16,12 @@ name: monorepo-changed-paths
 # A push without a usable previous tip (branch creation, force-push beyond
 # reachable history) and any other event without base_ref conservatively
 # report EVERY group as changed, never a silent all-false.
+#
+# pull_request_target is REJECTED. GitHub checks out the base branch (not the
+# PR) for that privileged event, so a git diff sees none of the proposed
+# changes and would return a green all-false; checking out fork code under
+# pull_request_target is itself unsafe. Route change detection on
+# pull_request instead (its checkout contains the PR's merged tree).
 
 on:
   workflow_call:
@@ -158,6 +164,18 @@ jobs:
           merge_group_base = os.environ["MERGE_GROUP_BASE_SHA"]
           push_before = os.environ["PUSH_BEFORE"]
 
+          # pull_request_target checks out the base branch, not the PR, so a
+          # git diff here cannot see the proposed changes and would report a
+          # green all-false. Reject it before any base resolution; a git-diff
+          # router must not be trusted under this privileged event, and
+          # checking out fork code to work around it is unsafe.
+          if event == "pull_request_target":
+              fail(
+                  "pull_request_target is not supported: GitHub checks out the "
+                  "base branch (not the PR), so change detection would silently "
+                  "return all-false. Route this workflow on pull_request instead."
+              )
+
           conservative_reason = None
           diff_base = None
           if base_ref:
@@ -168,7 +186,7 @@ jobs:
               if merge.returncode != 0:
                   fail(f"no merge base between base_ref {base_ref!r} and HEAD")
               diff_base = merge.stdout.strip()
-          elif event in {"pull_request", "pull_request_target"}:
+          elif event == "pull_request":
               commit = resolve_commit(pr_base)
               if commit is None:
                   fail("pull request base SHA is missing or unreachable")

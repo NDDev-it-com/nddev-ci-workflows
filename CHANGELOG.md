@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **`monorepo-changed-paths` rejects `pull_request_target`.** Under that
+  privileged event GitHub checks out the base branch rather than the PR, so
+  the git-diff router saw none of the proposed changes and returned a green
+  all-false — silently skipping every gated test, scan, build, or migration.
+  The router now hard-fails on `pull_request_target` (before any base
+  resolution, and regardless of an explicit `base_ref`) with a message
+  pointing callers to `pull_request`; checking out fork code to work around
+  it is unsafe and intentionally not offered. `check_monorepo_routing.py`
+  gains negative fixtures proving both the payload-base and explicit-base
+  forms fail closed. (RVR-P2-005)
+
 ## [0.6.0] - 2026-07-11
 
 ### Added

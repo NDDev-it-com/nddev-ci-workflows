@@ -7,7 +7,7 @@ external tools, and deprecations of `nddev-ci-workflows`. Human-facing docs unde
 defined below (required keys, key order, enum membership, and cross-file
 references).
 
-**Last verified: 2026-07-04**
+**Last verified: 2026-07-11**
 
 ## Files
 

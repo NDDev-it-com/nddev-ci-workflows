@@ -57,6 +57,14 @@ jobs:
       archive_paths: "README.md LICENSE VERSION CHANGELOG.md src"
 ```
 
+The attested caller above requires a **public repository (any plan)** or a
+**private repository on GitHub Enterprise Cloud** — Artifact Attestations are
+plan-gated on private/internal repos. Private Free/Pro/Team repositories call
+`release-supply-chain-free.yml` instead, with `permissions: { contents: write }`
+only; it publishes the same five checksummed assets without attestation steps
+(see [`examples/release/private-free-release.yml`](../examples/release/private-free-release.yml)
+and [07 Supply chain](07-supply-chain-slsa-sbom-attestations.md)).
+
 ## Immutable releases
 
 **Immutable releases are GA (2025-10-28): published assets cannot be modified,
@@ -142,4 +150,4 @@ long-lived publish tokens). See
 the same pattern applied to cloud providers.
 
 ---
-Last verified: 2026-07-10
+Last verified: 2026-07-11

@@ -4,7 +4,24 @@ This is the heart of the library: producing verifiable evidence of *what was
 built, from what source, by which workflow*. `release-supply-chain.yml`
 implements the whole chain — deterministic archive, SPDX SBOM, canonical
 release notes, `SHA256SUMS`, Sigstore-backed attestations, and an immutable
-GitHub Release.
+GitHub Release. `release-supply-chain-free.yml` is the same closed pipeline
+without the attestation steps, for repositories where the platform withholds
+attestations.
+
+## Plan availability
+
+GitHub **Artifact Attestations** are available to **public repositories on
+every GitHub plan**. Private and internal repositories require **GitHub
+Enterprise Cloud**: this is a plan gate, not part of GHAS/Code Security, and
+attestations are not supported on GitHub Enterprise Server at all. On a
+private Free, Pro, or Team repository the `actions/attest*` steps fail before
+the release is created, so the private-free tier calls
+[`release-supply-chain-free.yml`](02-private-free.md) — identical archive,
+SBOM, canonical notes, manifest, and `SHA256SUMS`, no attestation actions,
+`contents: write` only, and `slsa_build_level: null` in the manifest. On GHEC,
+private-repository attestations use GitHub's internal Sigstore instance (same
+codebase, no public transparency log) instead of the Sigstore Public Good
+Instance.
 
 ## SLSA levels and how we reach Build L3
 
@@ -20,7 +37,10 @@ GitHub **Artifact Attestations** provide SLSA **Build L2** out of the box.
 **Build L3 is achieved when the build runs inside a reusable workflow**, because
 the reusable's identity and isolation make the provenance non-falsifiable by the
 calling repository. `release-supply-chain.yml` *is* a reusable workflow, so
-releases built through it qualify to claim **SLSA Build L3**.
+releases built through it qualify to claim **SLSA Build L3**. These claims
+apply where attestations are plan-eligible (see above);
+`release-supply-chain-free.yml` deliberately claims nothing
+(`slsa_build_level: null`).
 
 ## Sigstore
 
@@ -183,4 +203,4 @@ See [09 Releases & packages](09-releases-packages.md) for the tag-driven flow.
    immutable create call, using the canonical notes asset as the release body.
 
 ---
-Last verified: 2026-07-10
+Last verified: 2026-07-11

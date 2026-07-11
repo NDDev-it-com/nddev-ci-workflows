@@ -42,7 +42,8 @@
 | npm trusted publishing (`npm-trusted-publishing`) | releases-packages | ga | free | free | available | `-` | `examples/release/npm-trusted-publishing.yml` |
 | PyPI trusted publishing (`pypi-trusted-publishing`) | releases-packages | ga | free | free | available | `-` | `examples/release/pypi-trusted-publishing.yml` |
 | Release automation (release-please / changesets) (`release-automation`) | releases-packages | ga | free | free | available | `-` | `examples/level3/release-please.yml` |
-| Release supply chain (SBOM + attest + publish) (`release-supply-chain`) | releases-packages | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `examples/public-oss/release.yml` |
+| Release supply chain (SBOM + attest + publish) (`release-supply-chain`) | releases-packages | ga | free | paid | conditional | `.github/workflows/release-supply-chain.yml` | `examples/public-oss/release.yml` |
+| Release supply chain without attestations (private-free) (`release-supply-chain-free`) | releases-packages | ga | free | free | available | `.github/workflows/release-supply-chain-free.yml` | `examples/release/private-free-release.yml` |
 | GitHub-hosted runner governance controls (`hosted-runner-governance-controls`) | runners | preview | conditional | conditional | conditional | `-` | `-` |
 | Larger and GPU hosted runners (`larger-gpu-runners`) | runners | ga | paid | unavailable | available | `-` | `-` |
 | RHEL 9/10 larger-runner images (`rhel-larger-runner-images`) | runners | preview | paid | unavailable | conditional | `-` | `-` |
@@ -61,7 +62,7 @@
 | Semgrep OSS SAST (`semgrep-sast`) | security-scanning | ga | free | free | available | `.github/workflows/semgrep-ci.yml` | `examples/security/semgrep.yml` |
 | zizmor workflow security scanner (`zizmor`) | security-scanning | ga | free | free | available | `.github/workflows/zizmor-sarif.yml` | `-` |
 | zizmor workflow security scanner (no SARIF) (`zizmor-no-sarif`) | security-scanning | ga | free | free | available | `.github/workflows/zizmor-no-sarif.yml` | `examples/private-free/security.yml` |
-| Artifact attestations (`artifact-attestations`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |
+| Artifact attestations (`artifact-attestations`) | supply-chain | ga | free | paid | conditional | `.github/workflows/release-supply-chain.yml` | `-` |
 | Dependabot version and security updates (`dependabot`) | supply-chain | ga | free | free | available | `-` | `-` |
 | Dependency review (`dependency-review`) | supply-chain | ga | free | unavailable | available | `.github/workflows/public-dependency-review.yml` | `examples/public-oss/dependency-review.yml` |
 | Grype vulnerability scan (`grype-sca`) | supply-chain | ga | free | free | available | `.github/workflows/grype-scan.yml` | `examples/security/grype-scan.yml` |
@@ -69,7 +70,7 @@
 | Open source license compliance (`license-compliance-preview`) | supply-chain | preview | unavailable | unavailable | conditional | `-` | `-` |
 | OSV-Scanner SCA (`osv-scanner-sca`) | supply-chain | ga | free | free | available | `.github/workflows/osv-scan.yml` | `examples/security/osv-scan.yml` |
 | SBOM generation (`sbom-generation`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |
-| SLSA build provenance (`slsa-build-provenance`) | supply-chain | ga | free | free | available | `.github/workflows/release-supply-chain.yml` | `-` |
+| SLSA build provenance (`slsa-build-provenance`) | supply-chain | ga | free | paid | conditional | `.github/workflows/release-supply-chain.yml` | `-` |
 
 ---
 Last generated: 2026-07-08

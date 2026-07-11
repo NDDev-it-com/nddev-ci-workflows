@@ -18,6 +18,7 @@ them in the private-free tier:
 | Dependency review action | Paid (GHAS) on private | [03 GHAS](03-private-paid-ghas.md) |
 | `step-security/harden-runner` | Paid on private repos | use a private-free workflow with no action reference |
 | SARIF upload to code scanning | Requires code scanning (paid) | use the no-SARIF workflow variant |
+| GitHub Artifact Attestations | Require GitHub Enterprise Cloud on private/internal (a plan gate — GHAS does not unlock it) | use `release-supply-chain-free.yml` (below) |
 
 ## The zero-cost private stack
 
@@ -27,7 +28,7 @@ them in the private-free tier:
 | Actions static analysis | `zizmor-no-sarif.yml` | fails on findings, no upload |
 | Secret scanning (history-aware) | `secret-scan.yml` | gitleaks; contains no paid action |
 | Static validation | `private-static.yml` | single Ubuntu job, no matrix/cache |
-| Local SBOM + attestations | `release-supply-chain.yml` | attestations work on private |
+| Release supply chain (SBOM, checksums, no attestations) | `release-supply-chain-free.yml` | attestations require GHEC on private |
 | Cross-platform smoke | `cross-platform-smoke.yml` | OS matrix |
 | Cloud auth | OIDC | short-lived credentials, no stored secrets |
 
@@ -91,13 +92,20 @@ jobs:
       timeout_minutes: 10
 ```
 
-## Local SBOM + attestations on private
+## Release supply chain without attestations (`release-supply-chain-free.yml`)
 
-Artifact attestations (`id-token: write` + `attestations: write`) work on
-private repositories and do **not** require GHAS. `release-supply-chain.yml`
-produces an SPDX SBOM, `SHA256SUMS`, and Sigstore-backed provenance. Verify with
-`gh attestation verify` — details in
-[07 Supply chain](07-supply-chain-slsa-sbom-attestations.md).
+GitHub Artifact Attestations are **not available to private or internal
+repositories on the Free, Pro, or Team plan** — they require GitHub Enterprise
+Cloud. That is a plan gate, not a GHAS gate, so buying Code Security does not
+unlock it either. `release-supply-chain.yml` would fail at its unconditional
+attestation steps on such repositories, so the private-free tier calls
+`release-supply-chain-free.yml`: the same deterministic tracked-source archive,
+exact-payload SPDX SBOM, canonical release notes, manifest, and `SHA256SUMS`,
+published as one immutable release — with no attestation actions and only
+`contents: write`. The manifest records `slsa_build_level: null` because no
+provenance is generated. Copy-paste caller:
+[`examples/release/private-free-release.yml`](../examples/release/private-free-release.yml).
+Details: [07 Supply chain](07-supply-chain-slsa-sbom-attestations.md).
 
 ## OIDC instead of stored secrets
 
@@ -124,4 +132,4 @@ auto-scale (e.g. Actions Runner Controller), and treat egress carefully — see
 [05 Runners](05-runners.md#self-hosted).
 
 ---
-Last verified: 2026-07-10
+Last verified: 2026-07-11

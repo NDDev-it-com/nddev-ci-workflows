@@ -14,7 +14,7 @@ path in [`docs/`](docs/00-overview.md) and the machine-readable
 | Tier | What you get | Notes |
 | --- | --- | --- |
 | **Public OSS** | The full free security suite: CodeQL, OSSF Scorecard, dependency review, native secret scanning, gitleaks, actionlint, zizmor (SARIF), harden-runner, SBOM + attestations. | Standard hosted runners and code scanning are free on public repos. |
-| **Private-free** | Zero-cost only: actionlint, zizmor (no SARIF), gitleaks, private static validation, cross-platform smoke, SBOM + attestations, OIDC. | CodeQL, native secret scanning, dependency review, and harden-runner are **paid** on private repos and are excluded here. |
+| **Private-free** | Zero-cost only: actionlint, zizmor (no SARIF), gitleaks, private static validation, cross-platform smoke, SBOM + checksummed immutable releases (no attestations), OIDC. | CodeQL, native secret scanning, dependency review, and harden-runner are **paid** on private repos and are excluded here. Artifact attestations require **GitHub Enterprise Cloud** on private repos — release with `release-supply-chain-free.yml`. |
 | **Private-paid / GHAS** | Everything in public, on private repos, via GitHub Code Security / Secret Protection. | Requires a paid plan. |
 
 See [`docs/01-public-oss-free.md`](docs/01-public-oss-free.md),
@@ -34,7 +34,8 @@ See [`docs/01-public-oss-free.md`](docs/01-public-oss-free.md),
 | zizmor (SARIF) | `zizmor-sarif.yml` | ✅ | ❌ (needs code scanning) | ✅ |
 | zizmor (no SARIF) | `zizmor-no-sarif.yml` | ✅ | ✅ | ✅ |
 | Cross-platform smoke | `cross-platform-smoke.yml` | ✅ | ✅ | ✅ |
-| Release supply chain (SBOM + attest) | `release-supply-chain.yml` | ✅ | ✅ | ✅ |
+| Release supply chain (SBOM + attest) | `release-supply-chain.yml` | ✅ | ❌ needs GHEC | ⚠️ GHEC only |
+| Release supply chain (no attestations) | `release-supply-chain-free.yml` | ✅ | ✅ | ✅ |
 | Lightweight static validation | `private-static.yml` | ✅ | ✅ | ✅ |
 | Language CI packs | `python-ci.yml`, `node-ci.yml`, `go-ci.yml`, `rust-ci.yml`, `java-ci.yml`, `dotnet-ci.yml` | ✅ | ✅ | ✅ |
 | Container image scan (Trivy) | `container-ci.yml` | ✅ | ✅ | ✅ |
@@ -151,7 +152,11 @@ jobs:
       command: "python3 scripts/validate_all.py"
 ```
 
-### Release (either tier)
+### Release
+
+Attested variant — **public repositories on any plan, or private repositories
+on GitHub Enterprise Cloud** (GitHub Artifact Attestations are a plan gate on
+private/internal repos; GHAS does not unlock them):
 
 ```yaml
 # .github/workflows/release.yml
@@ -168,9 +173,25 @@ jobs:
       archive_paths: "README.md LICENSE VERSION CHANGELOG.md src"
 ```
 
+Private repositories on Free/Pro/Team use the attestation-free variant — same
+five checksummed assets, `contents: write` only, no attest actions:
+
+```yaml
+jobs:
+  publish:
+    permissions: { contents: write }
+    uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/release-supply-chain-free.yml@<sha>
+    with:
+      version: ${{ github.ref_name }}
+      package_name: my-repo
+      archive_paths: "README.md LICENSE VERSION CHANGELOG.md src"
+```
+
 The release is **immutable** and ships canonical checksummed release notes, an
-SPDX SBOM, SHA256SUMS, a build-provenance attestation, and an SBOM attestation
-(SLSA v1.0 Build L3). Verify with
+SPDX SBOM, SHA256SUMS, and (attested variant) a build-provenance attestation
+plus an SBOM attestation (SLSA v1.0 Build L3). The free variant records
+`slsa_build_level: null` in its manifest and makes no provenance claim. Verify
+attested releases with
 [`scripts/verify_attestations.sh`](scripts/verify_attestations.sh). See
 [`docs/07-supply-chain-slsa-sbom-attestations.md`](docs/07-supply-chain-slsa-sbom-attestations.md).
 

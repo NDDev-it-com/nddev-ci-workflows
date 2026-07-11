@@ -2,6 +2,31 @@
 
 ## [Unreleased]
 
+### Added
+
+- `release-supply-chain-free.yml`: the identical closed release pipeline
+  (deterministic tracked-source archive, exact-payload SPDX SBOM, canonical
+  release notes, manifest, `SHA256SUMS`, one-shot immutable publish) without
+  the GitHub attestation steps, requesting only `contents: write`. Its
+  manifest records `slsa_build_level: null`. Copy-paste caller:
+  `examples/release/private-free-release.yml`.
+
+### Fixed
+
+- Tier truth for GitHub Artifact Attestations: on the Free, Pro, and Team
+  plans attestations are available to **public repositories only**; private
+  and internal repositories require GitHub Enterprise Cloud (a plan gate that
+  GHAS/Code Security does not unlock). `release-supply-chain.yml` therefore
+  cannot complete on private Free/Pro/Team repositories — its unconditional
+  attestation steps fail before the release is created. The catalog
+  (`artifact-attestations`, `slsa-build-provenance`, `release-supply-chain`),
+  README tier tables, and docs 01/02/03/07/09 now state the real plan
+  boundary, and the private-free tier releases via
+  `release-supply-chain-free.yml`. The release validator enforces byte-level
+  step parity between the two variants (minus attestations), the free
+  variant's `contents: write`-only permission set, and the absence of any
+  attestation reference in the free variant.
+
 ## [0.5.1] - 2026-07-10
 
 ### Security

@@ -38,6 +38,7 @@ import check_rulesets
 import check_workflow_contracts
 import generate_docs
 import validate_catalog
+import validate_product_facts
 
 CHECKS = [
     ("pinned-actions", check_pinned_actions.check),
@@ -53,6 +54,7 @@ CHECKS = [
     ("merge-group", check_merge_group.check),
     ("rulesets", check_rulesets.check),
     ("catalog", validate_catalog.check),
+    ("product-facts", validate_product_facts.check),
     ("generated-docs", generate_docs.check),
 ]
 

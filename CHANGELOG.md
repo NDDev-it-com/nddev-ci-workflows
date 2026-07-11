@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Product-fact freshness gate (`catalog/product-facts.yml`).** External
+  plan, price, and quota facts change on the provider's schedule, not ours,
+  so the catalog now separates volatile product facts from stable capability
+  identity. Each live fact carries `verified_at`/`expires_after` plus source
+  authority and optional `supersedes`/`conflicts_with`;
+  `scripts/validate_product_facts.py` (wired into `validate_all`) fails CI when
+  a live fact is expired, when facts about the same product/plan/visibility
+  disagree without a supersession, when a `product_facts` capability reference
+  is unknown, or when a required anchor fact is dropped. Deprecated facts
+  (shut-down services) are exempt from expiry. Tier-sensitive capabilities
+  (`artifact-attestations`, `slsa-build-provenance`, `release-supply-chain`,
+  `release-supply-chain-free`) now reference their backing facts via the new
+  optional `product_facts` field. `docs/generated/free-tier-matrix.md` is
+  generated from the ledger so no tariff is hand-copied. The GitHub Code
+  Quality commercial transition (GA 2026-07-20) is tracked with
+  `expires_after: 2026-07-20` so CI turns red on the day it must be
+  re-verified. (RVR-P2-006)
+
 ## [0.7.0] - 2026-07-12
 
 ### Added

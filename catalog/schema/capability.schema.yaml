@@ -91,3 +91,12 @@ properties:
           items:
             type: string
             pattern: "^https://"
+        product_facts:
+          description: >-
+            Optional list of product-facts.yml fact IDs whose plan/tier claims
+            this capability depends on. Checked by validate_product_facts.py.
+          type: array
+          minItems: 1
+          items:
+            type: string
+            pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"

@@ -24,6 +24,11 @@ CAP_FIELDS = {
     "workflow", "example", "required_permissions", "required_settings",
     "risks", "deprecations", "last_verified", "sources",
 }
+# Optional fields a capability may declare in addition to the required set.
+# `product_facts` links a capability's tier claims to fact IDs in
+# `product-facts.yml`; validate_product_facts.py checks those references
+# resolve and that the facts are not expired.
+CAP_OPTIONAL_FIELDS = {"product_facts"}
 VALID_STATUS = {"ga", "preview", "deprecated", "retiring", "planned"}
 VALID_TIER_AVAIL = {"free", "paid", "unavailable", "conditional"}
 VALID_PRIVATE_PAID = {"available", "unavailable", "conditional"}
@@ -67,7 +72,13 @@ def check() -> list[str]:
                 continue
             cid = cap.get("id", "<no-id>")
             missing = CAP_FIELDS - set(cap.keys())
-            extra = set(cap.keys()) - CAP_FIELDS
+            extra = set(cap.keys()) - CAP_FIELDS - CAP_OPTIONAL_FIELDS
+            product_facts = cap.get("product_facts")
+            if product_facts is not None and (
+                not isinstance(product_facts, list)
+                or not all(isinstance(ref, str) for ref in product_facts)
+            ):
+                problems.append(f"capability `{cid}`: product_facts must be a list of fact ids")
             if missing:
                 problems.append(f"capability `{cid}`: missing fields {sorted(missing)}")
             if extra:

@@ -26,7 +26,9 @@ from typing import Any
 from _workflow_yaml import WORKFLOWS_DIR, load_yaml
 
 REUSABLE = WORKFLOWS_DIR / "release-supply-chain.yml"
+FREE = WORKFLOWS_DIR / "release-supply-chain-free.yml"
 SELF_RELEASE = WORKFLOWS_DIR / "release.yml"
+ATTEST_STEP_NAMES = ("Attest build provenance (archive)", "Attest SBOM (archive)")
 EXPECTED_STATIC_ASSETS = {
     "sbom.spdx.json",
     "release-notes.md",
@@ -978,7 +980,9 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _check_asset_program(program: str, problems: list[str]) -> None:
+def _check_asset_program(
+    program: str, problems: list[str], *, expected_slsa: int | None
+) -> None:
     with tempfile.TemporaryDirectory(prefix="nddev-release-assets-") as raw_root:
         root = Path(raw_root)
         _init_repo(root)
@@ -1021,6 +1025,11 @@ def _check_asset_program(program: str, problems: list[str]) -> None:
             "SHA256SUMS",
         ]:
             problems.append("release manifest does not declare the exact asset closure")
+        if manifest.get("slsa_build_level", "absent") != expected_slsa:
+            problems.append(
+                "release manifest slsa_build_level does not match the variant "
+                f"contract (expected {expected_slsa!r})"
+            )
         source_commit = _run(["git", "rev-parse", "HEAD"], cwd=root).stdout.strip()
         source_tag_object = _run(
             ["git", "rev-parse", "refs/tags/1.2.3"], cwd=root
@@ -1081,11 +1090,17 @@ def _check_asset_program(program: str, problems: list[str]) -> None:
 def check() -> list[str]:
     problems: list[str] = []
     reusable = load_yaml(REUSABLE)
+    free = load_yaml(FREE)
     self_release = load_yaml(SELF_RELEASE)
     reusable_text = REUSABLE.read_text(encoding="utf-8")
+    free_text = FREE.read_text(encoding="utf-8")
     self_text = SELF_RELEASE.read_text(encoding="utf-8")
 
-    for name, text in ((REUSABLE.name, reusable_text), (SELF_RELEASE.name, self_text)):
+    for name, text in (
+        (REUSABLE.name, reusable_text),
+        (FREE.name, free_text),
+        (SELF_RELEASE.name, self_text),
+    ):
         for line_number, line in enumerate(text.splitlines(), start=1):
             if "python3" in line and re.search(r"\bpython3\s+(?!-I\b)", line):
                 problems.append(
@@ -1299,6 +1314,91 @@ def check() -> list[str]:
             "canonical release notes must be materialized once in release-dist"
         )
 
+    # ---- private-free variant: plan-eligible contract without attestations ----
+
+    expected_free_step_names = [
+        name for name in expected_step_names if name not in ATTEST_STEP_NAMES
+    ]
+    free_step_names = [step.get("name") for step in _steps(free, "release")]
+    if free_step_names != expected_free_step_names:
+        problems.append(
+            "free release workflow step order must equal the attested contract "
+            "minus the two attestation steps"
+        )
+
+    for forbidden in (
+        "actions/attest",
+        "step-security/harden-runner@",
+        "sbom_source_path",
+        "raw.githubusercontent.com/anchore/syft",
+        "install.sh",
+    ):
+        if forbidden in free_text:
+            problems.append(f"free release workflow must not contain: {forbidden}")
+
+    free_jobs = free.get("jobs", {})
+    free_job = free_jobs.get("release", {}) if isinstance(free_jobs, dict) else {}
+    free_permissions = free_job.get("permissions") if isinstance(free_job, dict) else None
+    if free_permissions != {"contents": "write"}:
+        problems.append(
+            "free release job must request exactly `contents: write` — GitHub "
+            "attestation permissions are unavailable on private Free/Pro/Team plans"
+        )
+
+    attested_jobs = reusable.get("jobs", {})
+    attested_job = (
+        attested_jobs.get("release", {}) if isinstance(attested_jobs, dict) else {}
+    )
+    attested_permissions = (
+        attested_job.get("permissions") if isinstance(attested_job, dict) else None
+    )
+    if attested_permissions != {
+        "contents": "write",
+        "id-token": "write",
+        "attestations": "write",
+    }:
+        problems.append(
+            "attested release job must request exactly contents/id-token/"
+            "attestations write"
+        )
+
+    # Byte-level step parity: the free pipeline must be the attested pipeline
+    # minus attestations, so the two variants cannot silently drift apart.
+    slsa_attested = '"slsa_build_level": 3,'
+    slsa_free = '"slsa_build_level": None,'
+    for name in expected_free_step_names:
+        attested_step = _step(reusable, "release", name)
+        free_step = _step(free, "release", name)
+        if attested_step is None or free_step is None:
+            problems.append(f"release variant step missing for parity check: {name}")
+            continue
+        if name == "Finalize manifest, checksums, and asset closure":
+            attested_run = attested_step.get("run")
+            free_run = free_step.get("run")
+            if (
+                not isinstance(attested_run, str)
+                or not isinstance(free_run, str)
+                or slsa_attested not in attested_run
+                or slsa_free not in free_run
+                or free_run != attested_run.replace(slsa_attested, slsa_free)
+            ):
+                problems.append(
+                    "free asset finalizer must equal the attested one except "
+                    "for `slsa_build_level: None`"
+                )
+            attested_rest = {k: v for k, v in attested_step.items() if k != "run"}
+            free_rest = {k: v for k, v in free_step.items() if k != "run"}
+            if attested_rest != free_rest:
+                problems.append(
+                    "free asset finalizer step metadata drifted from the "
+                    "attested variant"
+                )
+            continue
+        if attested_step != free_step:
+            problems.append(
+                f"free release step drifted from the attested variant: {name}"
+            )
+
     try:
         input_program = _embedded_python(
             _step(reusable, "release", "Validate release inputs before checkout")
@@ -1312,6 +1412,9 @@ def check() -> list[str]:
             _step(
                 reusable, "release", "Finalize manifest, checksums, and asset closure"
             )
+        )
+        free_asset_program = _embedded_python(
+            _step(free, "release", "Finalize manifest, checksums, and asset closure")
         )
         self_version = _embedded_python(
             _step(self_release, "resolve", "Resolve and validate version")
@@ -1329,7 +1432,8 @@ def check() -> list[str]:
     _check_syft_program(syft_run, syft_env, problems)
     _check_notes_program(notes_program, problems)
     _check_publish_program(publish_run, problems)
-    _check_asset_program(asset_program, problems)
+    _check_asset_program(asset_program, problems, expected_slsa=3)
+    _check_asset_program(free_asset_program, problems, expected_slsa=None)
     return problems
 
 

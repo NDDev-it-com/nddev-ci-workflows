@@ -1,6 +1,9 @@
 # Monorepo changed-paths router (any tier). Replace @<sha>.
 # The reusable emits outputs.result (JSON of matched filters) that downstream
 # jobs gate on with `needs: changes` + `if: fromJSON(needs.changes.outputs.result).backend`.
+# Filters are a strict JSON object: exact file paths or directory prefixes
+# ending in '/' — no wildcards. Unresolvable PR/merge_group/base_ref bases fail
+# the run; a push without a previous tip reports every group as changed.
 name: monorepo
 on:
   pull_request: { branches: [main] }
@@ -13,8 +16,4 @@ jobs:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/monorepo-changed-paths.yml@<sha>
     with:
-      filters: |
-        backend:
-          - 'backend/**'
-        frontend:
-          - 'frontend/**'
+      filters: '{"backend":["backend/"],"frontend":["frontend/"]}'

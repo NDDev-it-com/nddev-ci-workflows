@@ -2,11 +2,17 @@ name: actionlint
 
 # Reusable actionlint (checksum-verified binary) for BOTH tiers.
 # Lints workflow YAML for syntax errors, expression typos, and deprecated usage.
+#
+# Runner contract: Linux X64 only. The workflow downloads the upstream
+# linux_amd64 tarball, verifies it with sha256sum, and installs into
+# /usr/local/bin, so any other OS/architecture is rejected by an explicit
+# guard before the download instead of failing half-way through.
 
 on:
   workflow_call:
     inputs:
       runner:
+        description: 'Linux X64 runner label; other platforms are rejected by the runner-contract guard.'
         type: string
         default: 'ubuntu-latest'
       actionlint_version:
@@ -31,6 +37,34 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Validate runner contract
+        shell: bash
+        env:
+          ACTIONLINT_RUNNER_OS: ${{ runner.os }}
+          ACTIONLINT_RUNNER_ARCH: ${{ runner.arch }}
+        run: |
+          set -euo pipefail
+          python3 -I <<'PY'
+          import os
+          import sys
+
+          def fail(message):
+              print(f"actionlint runner contract: {message}", file=sys.stderr)
+              raise SystemExit(1)
+
+          if os.environ["ACTIONLINT_RUNNER_OS"] != "Linux":
+              fail(
+                  "this workflow downloads the linux_amd64 actionlint binary; "
+                  "the runner must be Linux X64"
+              )
+          if os.environ["ACTIONLINT_RUNNER_ARCH"] != "X64":
+              fail(
+                  "the pinned actionlint_sha256 covers the linux_amd64 tarball "
+                  "only; the runner must be Linux X64"
+              )
+          print("runner contract validated: Linux X64")
+          PY
+
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:

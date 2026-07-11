@@ -8,5 +8,10 @@ are mutable; Dependabot bumps the SHA for you).
 - [`private-free/`](private-free/) — zero-cost stack for private repos.
 - [`private-paid-ghas/`](private-paid-ghas/) — GHAS-enabled private repos.
 
+Use-case groups shared by every tier: [`languages/`](languages/),
+[`quality/`](quality/), [`security/`](security/), [`testing/`](testing/),
+[`infra/`](infra/), [`release/`](release/), and opt-in
+[`level3/`](level3/) patterns.
+
 A caller job **must grant every permission the reusable job declares**, or the
 run fails at startup. See [`../docs/04-actions-core.md`](../docs/04-actions-core.md).

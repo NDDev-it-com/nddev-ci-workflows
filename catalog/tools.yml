@@ -53,6 +53,7 @@ tools:
     pin: "linux_amd64 size:27565477 sha256:0d6be741479eddd2c8644a288990c04f3df0d609bbc1599a005532a9dff63509; linux_arm64 size:25154290 sha256:dc630590c953347789d08f8ebf57c7d8094db89100785fcd94b1cddeac791804"
     used_by:
       - .github/workflows/release-supply-chain.yml
+      - .github/workflows/release-supply-chain-free.yml
     last_verified: "2026-07-10"
 
   - id: harden-runner
@@ -382,4 +383,5 @@ tools:
     pin: "benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba"
     used_by:
       - .github/workflows/benchmark.yml
+      - .github/workflows/benchmark-compare.yml
     last_verified: "2026-07-08"

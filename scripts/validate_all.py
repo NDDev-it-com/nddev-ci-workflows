@@ -24,6 +24,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import check_actionlint_contract
+import check_benchmark_contract
 import check_permissions
 import check_pinned_actions
 import check_release_supply_chain
@@ -31,6 +33,7 @@ import check_docs_links
 import check_examples
 import check_harden_runner_contract
 import check_merge_group
+import check_monorepo_routing
 import check_rulesets
 import check_workflow_contracts
 import generate_docs
@@ -42,6 +45,9 @@ CHECKS = [
     ("workflow-contracts", check_workflow_contracts.check),
     ("harden-runner-contract", check_harden_runner_contract.check),
     ("release-supply-chain", check_release_supply_chain.check),
+    ("monorepo-routing", check_monorepo_routing.check),
+    ("benchmark-contract", check_benchmark_contract.check),
+    ("actionlint-contract", check_actionlint_contract.check),
     ("examples", check_examples.check),
     ("docs-links", check_docs_links.check),
     ("merge-group", check_merge_group.check),

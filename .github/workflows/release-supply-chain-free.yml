@@ -1,23 +1,19 @@
-name: release-supply-chain
+name: release-supply-chain-free
 
-# Reusable release supply chain with GitHub-native attestations.
+# Reusable release supply chain for the private-free tier (no attestations).
 #
-# Plan eligibility (GitHub Artifact Attestations): public repositories on every
-# GitHub plan; private and internal repositories require GitHub Enterprise
-# Cloud. On a private Free/Pro/Team repository the unconditional attestation
-# steps below fail before the release is created — call
-# release-supply-chain-free.yml there instead (same five checksummed assets,
-# no attestations).
+# GitHub Artifact Attestations are unavailable to private and internal
+# repositories on the Free, Pro, and Team plans (they require GitHub
+# Enterprise Cloud), so this variant never invokes the GitHub attestation
+# actions and requests only the contents permission. Public repositories and
+# GHEC private repositories should call release-supply-chain.yml instead for
+# attested SLSA Build L3 provenance.
 #
 # Produces, for a numeric tag, exactly five release assets: a deterministic
 # tracked-source archive, an SPDX SBOM of that exact archive payload, canonical
-# release notes, a release manifest, and SHA256SUMS. It also emits TWO signed
-# attestations: SLSA build provenance for the archive and an SBOM attestation.
-# It then publishes ONE immutable GitHub Release with every asset attached in a
-# single create call.
-#
-# SLSA note: build provenance generated from inside this reusable workflow meets
-# SLSA v1.0 Build Level 3 (build logic is isolated from the caller).
+# release notes, a release manifest, and SHA256SUMS. It publishes ONE immutable
+# GitHub Release with every asset attached in a single create call. The release
+# manifest records slsa_build_level: null because no provenance is generated.
 #
 # Immutable releases (GA 2025-10-28): assets on a published release cannot be
 # modified, deleted, or clobbered. This workflow therefore fails fast if the
@@ -54,13 +50,11 @@ permissions: {}
 
 jobs:
   release:
-    name: Build and publish release bundle
+    name: Build and publish release bundle (no attestations)
     runs-on: ${{ inputs.runner }}
     timeout-minutes: 30
     permissions:
       contents: write        # create the GitHub Release
-      id-token: write        # OIDC token for Sigstore signing
-      attestations: write    # persist build-provenance + SBOM attestations
     env:
       RELEASE_VERSION: ${{ inputs.version }}
       PACKAGE_NAME: ${{ inputs.package_name }}
@@ -655,7 +649,7 @@ jobs:
               "source_commit": source_commit,
               "source_commit_time": created,
               "source_tag_object": source_tag_object,
-              "slsa_build_level": 3,
+              "slsa_build_level": None,
               "required_artifacts": [
                   archive,
                   "sbom.spdx.json",
@@ -695,19 +689,6 @@ jobs:
               if path.is_symlink() or not path.is_file():
                   fail("every release asset must be a regular non-symlink file")
           PY
-
-      - name: Attest build provenance (archive)
-        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373  # v4.1.1
-        with:
-          subject-path: ${{ runner.temp }}/release-dist/${{ inputs.package_name }}-${{ inputs.version }}.tar.gz
-
-      - name: Attest SBOM (archive)
-        # actions/attest native SBOM mode (sbom-path) replaces the deprecated
-        # actions/attest-sbom; the SPDX predicate type is unchanged.
-        uses: actions/attest@a1948c3f048ba23858d222213b7c278aabede763  # v4.1.1
-        with:
-          subject-path: ${{ runner.temp }}/release-dist/${{ inputs.package_name }}-${{ inputs.version }}.tar.gz
-          sbom-path: ${{ runner.temp }}/release-dist/sbom.spdx.json
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1

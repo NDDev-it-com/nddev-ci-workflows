@@ -28,6 +28,13 @@ turning it on for private repos, where it is billed per active committer.
 > with GHAS enabled they run identically — the workflow is the same, only the
 > billing changes.
 
+> **Not unlocked by GHAS:** GitHub Artifact Attestations are gated by **plan**,
+> not by GHAS — private/internal repositories need GitHub Enterprise Cloud. On
+> a private Pro/Team repository with Code Security, `release-supply-chain.yml`
+> still fails at its attestation steps; release there with
+> `release-supply-chain-free.yml` instead
+> (see [07 Supply chain](07-supply-chain-slsa-sbom-attestations.md)).
+
 ## Enabling on a private repo
 
 1. Purchase/assign GHAS (Code Security and/or Secret Protection) at the org or

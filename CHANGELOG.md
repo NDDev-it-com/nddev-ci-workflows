@@ -2,6 +2,68 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-11
+
+### Added
+
+- `release-supply-chain-free.yml`: the identical closed release pipeline
+  (deterministic tracked-source archive, exact-payload SPDX SBOM, canonical
+  release notes, manifest, `SHA256SUMS`, one-shot immutable publish) without
+  the GitHub attestation steps, requesting only `contents: write`. Its
+  manifest records `slsa_build_level: null`. Copy-paste caller:
+  `examples/release/private-free-release.yml`.
+
+### Changed
+
+- `actionlint.yml` now states and enforces its real runner contract: the
+  workflow installs the checksum-verified linux_amd64 binary, so a
+  first-step guard rejects any runner that is not Linux X64 with a clear
+  error before the download instead of failing halfway through install.
+  `scripts/check_actionlint_contract.py` executes the guard against a
+  supported/unsupported OS-architecture matrix via `validate_all`.
+- **Breaking (`benchmark`):** the single dual-mode workflow is split into a
+  publish lane and a read-only compare lane, because compare-only runs
+  (`auto_push: false`) still granted `contents: write` and handed a
+  write-capable `GITHUB_TOKEN` to the third-party benchmark action.
+  `benchmark.yml` now always publishes history (`auto-push: true`,
+  `contents: write`) and drops the `auto_push` input; `benchmark-compare.yml`
+  is the new read-only lane (`contents: read`, `auto-push: false`) whose
+  job-scoped token cannot write. `scripts/check_benchmark_contract.py` keeps
+  the two lanes byte-parallel except for that single difference. Callers that
+  passed `auto_push: false` switch to `benchmark-compare.yml`; callers on the
+  default publish behavior keep `benchmark.yml` unchanged.
+- **Breaking (`monorepo-changed-paths`):** the router is now fail-closed.
+  `filters` is a strict JSON object of exact file paths or directory prefixes
+  ending in `/`; wildcard patterns — previously matched via a
+  boundary-crossing `startswith` heuristic, so `src*` also matched `src-old/`
+  — now fail the run. An explicit `base_ref`, pull-request base, or
+  `merge_group` base that cannot be resolved fails the run instead of
+  silently reporting every group unchanged (the `git diff … || true`
+  suppression is gone). Pull-request routing uses merge-base semantics,
+  `merge_group` is handled as a first-class event, and a push without a
+  usable previous tip (branch creation, force-push beyond reachable history)
+  or any other event without `base_ref` conservatively reports every group
+  as changed. `scripts/check_monorepo_routing.py` exercises the embedded
+  program against a hermetic Git-DAG fixture matrix (invalid bases,
+  zero/unreachable `before`, multi-commit pushes, prefix boundaries,
+  renames, deletions, unusual filenames) via `validate_all`.
+
+### Fixed
+
+- Tier truth for GitHub Artifact Attestations: on the Free, Pro, and Team
+  plans attestations are available to **public repositories only**; private
+  and internal repositories require GitHub Enterprise Cloud (a plan gate that
+  GHAS/Code Security does not unlock). `release-supply-chain.yml` therefore
+  cannot complete on private Free/Pro/Team repositories — its unconditional
+  attestation steps fail before the release is created. The catalog
+  (`artifact-attestations`, `slsa-build-provenance`, `release-supply-chain`),
+  README tier tables, and docs 01/02/03/07/09 now state the real plan
+  boundary, and the private-free tier releases via
+  `release-supply-chain-free.yml`. The release validator enforces byte-level
+  step parity between the two variants (minus attestations), the free
+  variant's `contents: write`-only permission set, and the absence of any
+  attestation reference in the free variant.
+
 ## [0.5.1] - 2026-07-10
 
 ### Security

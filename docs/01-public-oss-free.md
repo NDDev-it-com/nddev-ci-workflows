@@ -125,7 +125,10 @@ Public repos can generate and publicly verify build provenance and SBOM
 attestations for free via Sigstore's public infrastructure. The release
 reusable builds a deterministic archive, an SPDX SBOM, `SHA256SUMS`, and attests
 them. Because the build runs inside a **reusable workflow**, it qualifies for
-**SLSA Build L3**. Full detail:
+**SLSA Build L3**. This is a public-repository entitlement: on private and
+internal repositories Artifact Attestations require GitHub Enterprise Cloud,
+and the private-free tier releases with `release-supply-chain-free.yml`
+instead — see [02 Private free](02-private-free.md). Full detail:
 [07 Supply chain](07-supply-chain-slsa-sbom-attestations.md).
 
 ## GHCR, Pages, and rulesets

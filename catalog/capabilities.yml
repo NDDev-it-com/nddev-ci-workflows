@@ -162,11 +162,13 @@ capabilities:
     example: null
     required_permissions:
       - "contents: read"
-    required_settings: []
+    required_settings:
+      - "Linux X64 runner (the workflow installs the checksum-verified linux_amd64 binary)"
     risks:
       - "Downloaded tarball is checksum-verified; bumping the version requires updating the SHA256"
+      - "A first-step guard rejects non-Linux-X64 runners before the download instead of failing mid-install"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-11"
     sources:
       - "https://github.com/rhysd/actionlint"
 
@@ -342,8 +344,8 @@ capabilities:
     cluster: supply-chain
     status: ga
     public_oss: free
-    private_free: free
-    private_paid: available
+    private_free: paid
+    private_paid: conditional
     workflow: .github/workflows/release-supply-chain.yml
     example: null
     required_permissions:
@@ -352,12 +354,15 @@ capabilities:
       - "contents: read"
     required_settings:
       - "Actions enabled"
+      - "Public repository on any plan; private/internal repositories require GitHub Enterprise Cloud (a plan gate — GHAS/Code Security does not unlock it)"
     risks:
+      - "On private Free/Pro/Team repositories the attest actions fail before release creation; use release-supply-chain-free.yml there"
       - "Verify with 'gh attestation verify <file> -R <org>/<repo>'"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-11"
     sources:
       - "https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds"
+      - "https://docs.github.com/en/actions/concepts/security/artifact-attestations"
 
   - id: sbom-generation
     name: SBOM generation
@@ -385,8 +390,8 @@ capabilities:
     cluster: supply-chain
     status: ga
     public_oss: free
-    private_free: free
-    private_paid: available
+    private_free: paid
+    private_paid: conditional
     workflow: .github/workflows/release-supply-chain.yml
     example: null
     required_permissions:
@@ -395,13 +400,16 @@ capabilities:
       - "contents: read"
     required_settings:
       - "Build must run inside a reusable workflow to qualify for SLSA Build L3"
+      - "Public repository on any plan; private/internal repositories require GitHub Enterprise Cloud for Artifact Attestations"
     risks:
       - "Artifact Attestations give Build L2 by default; L3 is only valid because release-supply-chain.yml is a reusable workflow"
+      - "release-supply-chain-free.yml intentionally makes no SLSA claim (slsa_build_level: null)"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-11"
     sources:
       - "https://slsa.dev/spec/v1.0/levels"
       - "https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds"
+      - "https://docs.github.com/en/actions/concepts/security/artifact-attestations"
 
   - id: immutable-releases
     name: Immutable releases
@@ -713,8 +721,8 @@ capabilities:
     cluster: releases-packages
     status: ga
     public_oss: free
-    private_free: free
-    private_paid: available
+    private_free: paid
+    private_paid: conditional
     workflow: .github/workflows/release-supply-chain.yml
     example: examples/public-oss/release.yml
     required_permissions:
@@ -723,14 +731,39 @@ capabilities:
       - "attestations: write"
     required_settings:
       - "OIDC available for attestations"
+      - "Public repository on any plan; private/internal repositories require GitHub Enterprise Cloud for the attestation steps"
       - "Immutable-releases-compatible publish flow (no --clobber)"
     risks:
+      - "Unconditional attestation steps fail on private Free/Pro/Team repositories before release creation; those callers must use release-supply-chain-free.yml"
       - "Immutable releases make --clobber fail; the workflow must create the release with all assets in one shot or draft-then-publish and fail-if-exists"
       - "GitHub release notes remain editable; release-notes.md is therefore published as a checksummed immutable asset"
     deprecations: null
-    last_verified: "2026-07-10"
+    last_verified: "2026-07-11"
     sources:
       - "https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds"
+      - "https://docs.github.com/en/actions/concepts/security/artifact-attestations"
+      - "https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository"
+
+  - id: release-supply-chain-free
+    name: Release supply chain without attestations (private-free)
+    cluster: releases-packages
+    status: ga
+    public_oss: free
+    private_free: free
+    private_paid: available
+    workflow: .github/workflows/release-supply-chain-free.yml
+    example: examples/release/private-free-release.yml
+    required_permissions:
+      - "contents: write"
+    required_settings:
+      - "Immutable-releases-compatible publish flow (no --clobber)"
+    risks:
+      - "Publishes no attestations and records slsa_build_level: null; plan-eligible repositories should use release-supply-chain.yml for SLSA provenance"
+      - "GitHub release notes remain editable; release-notes.md is therefore published as a checksummed immutable asset"
+    deprecations: null
+    last_verified: "2026-07-11"
+    sources:
+      - "https://docs.github.com/en/actions/concepts/security/artifact-attestations"
       - "https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository"
 
   - id: npm-trusted-publishing
@@ -968,10 +1001,10 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow is present on disk and validated by generated workflow inventory"
-      - "Path-filter matrices must fail safe (run everything) when the filter cannot resolve a merge base"
+      - "Strict filter language: exact file paths or '/'-terminated directory prefixes; wildcards fail the run (the pre-0.6 startswith matcher crossed prefix boundaries)"
+      - "Fail-closed routing: unresolvable base_ref/PR/merge_group bases fail the run; a push without a usable previous tip conservatively reports every group as changed"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-11"
     sources:
       - "https://docs.github.com/en/actions/using-workflows/reusing-workflows"
 
@@ -1354,7 +1387,7 @@ capabilities:
       - "https://google.github.io/clusterfuzzlite/"
 
   - id: benchmark
-    name: Performance benchmark + regression alert
+    name: Performance benchmark + regression alert (history publish)
     cluster: observability
     status: ga
     public_oss: free
@@ -1363,13 +1396,34 @@ capabilities:
     workflow: .github/workflows/benchmark.yml
     example: examples/testing/benchmark.yml
     required_permissions:
-      - "contents: write (gh-pages history when auto_push is true)"
+      - "contents: write (always pushes gh-pages benchmark history)"
     required_settings: []
     risks:
-      - "Storing history needs contents: write and a gh-pages branch; set auto_push false for compare-only runs"
+      - "Publish lane always pushes history to gh-pages; read-only regression checks belong in benchmark-compare.yml, which never receives a write-capable token"
       - "Benchmark noise on shared runners can cause false regressions; tune alert_threshold"
     deprecations: null
-    last_verified: "2026-07-08"
+    last_verified: "2026-07-11"
+    sources:
+      - "https://github.com/benchmark-action/github-action-benchmark"
+      - "https://bencher.dev/"
+
+  - id: benchmark-compare
+    name: Performance benchmark regression check (read-only compare)
+    cluster: observability
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/benchmark-compare.yml
+    example: examples/testing/benchmark-compare.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Read-only lane: the job-scoped GITHUB_TOKEN cannot write, and auto-push is hard-wired off; record history on the default branch with benchmark.yml"
+      - "Benchmark noise on shared runners can cause false regressions; tune alert_threshold"
+    deprecations: null
+    last_verified: "2026-07-11"
     sources:
       - "https://github.com/benchmark-action/github-action-benchmark"
       - "https://bencher.dev/"

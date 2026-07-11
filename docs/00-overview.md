@@ -24,7 +24,7 @@ Every doc here maps features to one of three tiers.
 | Tier | What you get | Doc |
 | --- | --- | --- |
 | **Public OSS (free full suite)** | Standard hosted runners, CodeQL, native secret scanning + push protection, dependency review, OSSF Scorecard, artifact attestations/SBOM, GHCR public, Pages, rulesets — all free | [01-public-oss-free.md](01-public-oss-free.md) |
-| **Private-free (zero-cost only)** | actionlint, zizmor (no SARIF upload), gitleaks, static validation, local SBOM + attestations, OIDC, cross-platform smoke. CodeQL / native secret scanning / dependency review / harden-runner are **paid** and excluded | [02-private-free.md](02-private-free.md) |
+| **Private-free (zero-cost only)** | actionlint, zizmor (no SARIF upload), gitleaks, static validation, SBOM + checksummed immutable releases (attestations need GHEC on private), OIDC, cross-platform smoke. CodeQL / native secret scanning / dependency review / harden-runner are **paid** and excluded | [02-private-free.md](02-private-free.md) |
 | **Private-paid / GHAS** | Code scanning, secret scanning + push protection, dependency review, Copilot Autofix, delegated governance — requires paid GitHub Code Security / Secret Protection | [03-private-paid-ghas.md](03-private-paid-ghas.md) |
 
 ## How to consume a reusable workflow
@@ -59,7 +59,8 @@ For end-to-end caller examples per tier, see the tier docs and the repository
 | `zizmor-no-sarif.yml` | zizmor Actions static analysis, no upload | Private-free |
 | `cross-platform-smoke.yml` | OS-matrix smoke test | Both |
 | `private-static.yml` | Zero-cost single-job validation | Private-free |
-| `release-supply-chain.yml` | Archive, SBOM, SHA256SUMS, attestations, Release | Both |
+| `release-supply-chain.yml` | Archive, SBOM, SHA256SUMS, attestations, Release | Public / private GHEC |
+| `release-supply-chain-free.yml` | Archive, SBOM, SHA256SUMS, Release (no attestations) | Both |
 | `ci.yml` | This repo's own self-CI | Internal |
 | `release.yml` | Tag-driven release entrypoint | Internal |
 | `python-ci.yml` / `node-ci.yml` / `go-ci.yml` / `rust-ci.yml` / `java-ci.yml` / `dotnet-ci.yml` | Language build/test/lint packs | Both |
@@ -70,7 +71,7 @@ For end-to-end caller examples per tier, see the tier docs and the repository
 | `dart-flutter-ci.yml` · `cpp-ci.yml` · `qt-ci.yml` · `kotlin-android-ci.yml` · `swift-ci.yml` · `r-ci.yml` · `web-ci.yml` · `sql-ci.yml` | Language packs (Dart/Flutter, C/C++, Qt, Kotlin/Android, Swift, R, web, SQL) | Both |
 | `coverage-gate.yml` · `docs-quality.yml` · `pr-hygiene.yml` | Coverage, docs quality, PR hygiene | Both |
 | `semgrep-ci.yml` · `osv-scan.yml` · `grype-scan.yml` · `hadolint-ci.yml` · `iac-scan.yml` | Free SAST/SCA/IaC (incl. private-free) | Both |
-| `mutation-testing.yml` · `fuzzing.yml` · `benchmark.yml` | Mutation testing, fuzzing, benchmark | Both |
+| `mutation-testing.yml` · `fuzzing.yml` · `benchmark.yml` · `benchmark-compare.yml` | Mutation testing, fuzzing, benchmark publish/compare lanes | Both |
 
 > The July 2026 language/quality/security/testing packs are documented in
 > [15 Language & quality packs](15-language-and-quality-packs.md).

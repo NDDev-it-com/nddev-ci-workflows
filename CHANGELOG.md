@@ -13,6 +13,17 @@
 
 ### Changed
 
+- **Breaking (`benchmark`):** the single dual-mode workflow is split into a
+  publish lane and a read-only compare lane, because compare-only runs
+  (`auto_push: false`) still granted `contents: write` and handed a
+  write-capable `GITHUB_TOKEN` to the third-party benchmark action.
+  `benchmark.yml` now always publishes history (`auto-push: true`,
+  `contents: write`) and drops the `auto_push` input; `benchmark-compare.yml`
+  is the new read-only lane (`contents: read`, `auto-push: false`) whose
+  job-scoped token cannot write. `scripts/check_benchmark_contract.py` keeps
+  the two lanes byte-parallel except for that single difference. Callers that
+  passed `auto_push: false` switch to `benchmark-compare.yml`; callers on the
+  default publish behavior keep `benchmark.yml` unchanged.
 - **Breaking (`monorepo-changed-paths`):** the router is now fail-closed.
   `filters` is a strict JSON object of exact file paths or directory prefixes
   ending in `/`; wildcard patterns — previously matched via a

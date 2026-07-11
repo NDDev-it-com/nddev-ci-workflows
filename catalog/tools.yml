@@ -383,4 +383,5 @@ tools:
     pin: "benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba"
     used_by:
       - .github/workflows/benchmark.yml
+      - .github/workflows/benchmark-compare.yml
     last_verified: "2026-07-08"

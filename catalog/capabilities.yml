@@ -1385,7 +1385,7 @@ capabilities:
       - "https://google.github.io/clusterfuzzlite/"
 
   - id: benchmark
-    name: Performance benchmark + regression alert
+    name: Performance benchmark + regression alert (history publish)
     cluster: observability
     status: ga
     public_oss: free
@@ -1394,13 +1394,34 @@ capabilities:
     workflow: .github/workflows/benchmark.yml
     example: examples/testing/benchmark.yml
     required_permissions:
-      - "contents: write (gh-pages history when auto_push is true)"
+      - "contents: write (always pushes gh-pages benchmark history)"
     required_settings: []
     risks:
-      - "Storing history needs contents: write and a gh-pages branch; set auto_push false for compare-only runs"
+      - "Publish lane always pushes history to gh-pages; read-only regression checks belong in benchmark-compare.yml, which never receives a write-capable token"
       - "Benchmark noise on shared runners can cause false regressions; tune alert_threshold"
     deprecations: null
-    last_verified: "2026-07-08"
+    last_verified: "2026-07-11"
+    sources:
+      - "https://github.com/benchmark-action/github-action-benchmark"
+      - "https://bencher.dev/"
+
+  - id: benchmark-compare
+    name: Performance benchmark regression check (read-only compare)
+    cluster: observability
+    status: ga
+    public_oss: free
+    private_free: conditional
+    private_paid: available
+    workflow: .github/workflows/benchmark-compare.yml
+    example: examples/testing/benchmark-compare.yml
+    required_permissions:
+      - "contents: read"
+    required_settings: []
+    risks:
+      - "Read-only lane: the job-scoped GITHUB_TOKEN cannot write, and auto-push is hard-wired off; record history on the default branch with benchmark.yml"
+      - "Benchmark noise on shared runners can cause false regressions; tune alert_threshold"
+    deprecations: null
+    last_verified: "2026-07-11"
     sources:
       - "https://github.com/benchmark-action/github-action-benchmark"
       - "https://bencher.dev/"

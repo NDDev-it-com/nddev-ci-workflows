@@ -1,5 +1,6 @@
-# Benchmark + regression alert caller. Needs contents: write for gh-pages history.
-# Replace @<sha> with a pinned full commit SHA.
+# Benchmark + regression alert caller (publish lane): always pushes gh-pages
+# history, hence contents: write. For pull requests and read-only checks use
+# examples/testing/benchmark-compare.yml. Replace @<sha> with a full SHA.
 name: benchmark
 on:
   push: { branches: [main] }

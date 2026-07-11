@@ -4,6 +4,7 @@
 | Workflow | Capability IDs | Statuses |
 | --- | --- | --- |
 | `.github/workflows/actionlint.yml` | `actionlint` | ga |
+| `.github/workflows/benchmark-compare.yml` | `benchmark-compare` | ga |
 | `.github/workflows/benchmark.yml` | `benchmark` | ga |
 | `.github/workflows/ci.yml` | internal | internal |
 | `.github/workflows/container-ci.yml` | `container-scan-trivy` | ga |

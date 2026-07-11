@@ -37,7 +37,8 @@
 | Merge queue (`merge-queue`) | governance | ga | conditional | unavailable | conditional | `-` | `-` |
 | Repository rulesets (`rulesets`) | governance | ga | free | conditional | available | `-` | `-` |
 | Workflow execution protections (`workflow-execution-protections`) | governance | preview | free | conditional | conditional | `-` | `-` |
-| Performance benchmark + regression alert (`benchmark`) | observability | ga | free | conditional | available | `.github/workflows/benchmark.yml` | `examples/testing/benchmark.yml` |
+| Performance benchmark + regression alert (history publish) (`benchmark`) | observability | ga | free | conditional | available | `.github/workflows/benchmark.yml` | `examples/testing/benchmark.yml` |
+| Performance benchmark regression check (read-only compare) (`benchmark-compare`) | observability | ga | free | conditional | available | `.github/workflows/benchmark-compare.yml` | `examples/testing/benchmark-compare.yml` |
 | Immutable releases (`immutable-releases`) | releases-packages | ga | free | free | available | `-` | `-` |
 | npm trusted publishing (`npm-trusted-publishing`) | releases-packages | ga | free | free | available | `-` | `examples/release/npm-trusted-publishing.yml` |
 | PyPI trusted publishing (`pypi-trusted-publishing`) | releases-packages | ga | free | free | available | `-` | `examples/release/pypi-trusted-publishing.yml` |

@@ -1,13 +1,12 @@
-name: benchmark
+name: benchmark-compare
 
-# Reusable performance benchmark PUBLISH lane for BOTH tiers. Sets up the
-# toolchain, runs a caller bench command that writes an output file, then
-# github-action-benchmark compares against gh-pages history, fails on
-# regression, and PUSHES the updated history (auto-push: true) — which is why
-# this lane, and only this lane, requests `contents: write`.
-# For pull requests and any read-only regression check use
-# benchmark-compare.yml: identical toolchain and comparison with a read-only
-# job token and no push.
+# Reusable performance benchmark COMPARE lane for BOTH tiers. Identical
+# toolchain setup and github-action-benchmark comparison to benchmark.yml, but
+# strictly read-only: the job requests `contents: read`, so the GITHUB_TOKEN
+# that reaches the third-party action cannot write to the repository, and
+# auto-push is hard-wired off (the action only fetches gh-pages history for
+# the comparison). Use benchmark.yml on the default branch to record history;
+# use this lane for pull requests and every other read-only regression check.
 
 on:
   workflow_call:
@@ -63,11 +62,11 @@ defaults:
 
 jobs:
   benchmark:
-    name: benchmark (${{ inputs.language }})
+    name: benchmark compare (${{ inputs.language }})
     runs-on: ${{ inputs.runner }}
     timeout-minutes: ${{ inputs.timeout_minutes }}
     permissions:
-      contents: write        # push benchmark history to the gh-pages branch
+      contents: read        # read-only token: comparison fetches history, never pushes
     defaults:
       run:
         working-directory: ${{ inputs.working_directory }}
@@ -115,5 +114,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           alert-threshold: ${{ inputs.alert_threshold }}
           fail-on-alert: ${{ inputs.fail_on_alert }}
-          auto-push: true
+          auto-push: false
           comment-on-alert: false

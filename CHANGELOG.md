@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-12
+
 ### Added
 
 - **Runtime contract coverage ledger (`catalog/runtime-coverage.yml`).** A

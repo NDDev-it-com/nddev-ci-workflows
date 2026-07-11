@@ -62,7 +62,8 @@ permission is required).
 | --- | --- | --- |
 | Mutation testing (mutmut/cargo-mutants/Stryker) | `mutation-testing.yml` | [mutation-testing](../examples/testing/mutation-testing.yml) |
 | Fuzzing (cargo-fuzz; ClusterFuzzLite noted) | `fuzzing.yml` | [fuzzing](../examples/testing/fuzzing.yml) |
-| Benchmark + regression alert | `benchmark.yml` | [benchmark](../examples/testing/benchmark.yml) |
+| Benchmark + regression alert (history publish) | `benchmark.yml` | [benchmark](../examples/testing/benchmark.yml) |
+| Benchmark regression check (read-only compare) | `benchmark-compare.yml` | [benchmark-compare](../examples/testing/benchmark-compare.yml) |
 
 ## Level-3 opt-in (self-contained examples)
 

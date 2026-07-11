@@ -42,16 +42,16 @@ EXPECTED_STATIC_ASSETS = {
 SYFT_PINS = {
     "ARM64": {
         "archive_arch": "arm64",
-        "sha256": "dc630590c953347789d08f8ebf57c7d8094db89100785fcd94b1cddeac791804",
-        "size": "25154290",
+        "sha256": "9fafef4db4f032ce81008d3a1529985d41ceb6ccdf2b388c9ce2f1ed7d32082e",
+        "size": "25829350",
     },
     "X64": {
         "archive_arch": "amd64",
-        "sha256": "0d6be741479eddd2c8644a288990c04f3df0d609bbc1599a005532a9dff63509",
-        "size": "27565477",
+        "sha256": "d654f678b709eb53c393d38519d5ed7d2e57205529404018614cfefa0fb2b5ca",
+        "size": "28342623",
     },
 }
-SYFT_VERSION = "1.42.3"
+SYFT_VERSION = "1.46.0"
 
 
 def _steps(workflow: dict[str, Any], job_name: str) -> list[dict[str, Any]]:

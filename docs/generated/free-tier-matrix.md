@@ -27,9 +27,9 @@ past its expiry, so a stale tier claim cannot silently mislead adopters.
 | `github-actions-private-team` | GitHub | Actions included usage | private | Team | recurring-quota | 3000 runner-minutes/month | official | 2026-07-11 | 2026-08-10 |
 | `github-actions-public-standard` | GitHub | Actions standard GitHub-hosted runners | public | Free, Pro, Team, Enterprise Cloud | public-unmetered | unmetered (standard-runner-minutes) | official | 2026-07-11 | 2026-08-10 |
 | `github-actions-self-hosted-control-plane` | GitHub | Actions self-hosted runners | public, private, internal | All eligible GitHub plans | zero-license-control-plane | unmetered (github-actions-control-plane-minutes) | official | 2026-07-11 | 2026-08-10 |
-| `github-attestations-private` | GitHub | Artifact attestations | private, internal | Enterprise Cloud | plan-gated | attestations | official | 2026-07-12 | 2026-08-10 |
+| `github-attestations-private` | GitHub | Artifact attestations | private, internal | Enterprise Cloud | plan-gated | attestations | official | 2026-07-11 | 2026-08-10 |
 | `github-attestations-public` | GitHub | Artifact attestations | public | Free, Pro, Team, Enterprise Cloud | included-feature | attestations | official | 2026-07-11 | 2026-08-10 |
-| `github-code-quality-transition` | GitHub | Code Quality | public, private, internal | Team, Enterprise Cloud | scheduled-paid-transition | 10 usd-per-active-committer/month | official | 2026-07-12 | 2026-07-20 |
+| `github-code-quality-transition` | GitHub | Code Quality | public, private, internal | Team, Enterprise Cloud | scheduled-paid-transition | 10 usd-per-active-committer/month | official | 2026-07-11 | 2026-07-20 |
 | `github-dependabot-private` | GitHub | Dependabot alerts and security updates | private | All eligible plans | included-feature | repository-feature | official | 2026-07-11 | 2026-08-10 |
 | `github-dependency-review-private` | GitHub | Dependency review | private | Team, Enterprise Cloud | add-on-gated | repository-feature | official | 2026-07-11 | 2026-08-10 |
 | `github-dependency-review-public` | GitHub | Dependency review | public | All current plans | included-feature | repository-feature | official | 2026-07-11 | 2026-08-10 |

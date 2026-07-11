@@ -228,7 +228,10 @@ immutable manifest/checksum boundary. No caller input changed from `0.5.0`.
 
 ## Common inputs
 
-- `runner` — runner label (default `ubuntu-latest`).
+- `runner` — runner label (default `ubuntu-latest`). Workflows with a
+  platform-specific payload enforce it: `actionlint.yml` accepts Linux X64
+  only (guarded first step), `release-supply-chain*.yml` require Linux
+  X64/ARM64.
 - `upload_sarif` (zizmor) — split into `zizmor-sarif.yml` (uploads) and
   `zizmor-no-sarif.yml` (least privilege; no `security-events: write`).
 - `egress_policy` — `audit` (default) or `block` for harden-runner.

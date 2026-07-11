@@ -13,6 +13,12 @@
 
 ### Changed
 
+- `actionlint.yml` now states and enforces its real runner contract: the
+  workflow installs the checksum-verified linux_amd64 binary, so a
+  first-step guard rejects any runner that is not Linux X64 with a clear
+  error before the download instead of failing halfway through install.
+  `scripts/check_actionlint_contract.py` executes the guard against a
+  supported/unsupported OS-architecture matrix via `validate_all`.
 - **Breaking (`benchmark`):** the single dual-mode workflow is split into a
   publish lane and a read-only compare lane, because compare-only runs
   (`auto_push: false`) still granted `contents: write` and handed a

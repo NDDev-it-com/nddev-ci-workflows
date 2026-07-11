@@ -68,6 +68,8 @@ jobs:
 Lints workflow YAML for syntax errors, expression typos, and deprecated usage.
 The binary is downloaded pinned and **checksum-verified** (`actionlint_sha256`).
 Free everywhere. Its reusable workflow contains no Harden-Runner reference.
+Linux X64 runners only: the workflow installs the linux_amd64 binary, and a
+first-step guard rejects any other platform before the download.
 
 ## gitleaks (`secret-scan.yml`)
 

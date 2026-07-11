@@ -162,11 +162,13 @@ capabilities:
     example: null
     required_permissions:
       - "contents: read"
-    required_settings: []
+    required_settings:
+      - "Linux X64 runner (the workflow installs the checksum-verified linux_amd64 binary)"
     risks:
       - "Downloaded tarball is checksum-verified; bumping the version requires updating the SHA256"
+      - "A first-step guard rejects non-Linux-X64 runners before the download instead of failing mid-install"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-11"
     sources:
       - "https://github.com/rhysd/actionlint"
 

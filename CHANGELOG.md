@@ -19,6 +19,22 @@
   `docs/07`, and `docs/13`; and add a 0.8.1 caller migration note. Contract-
   truth synchronization only — no workflow behavior change.
 
+- **Remove volatile GitHub tariffs from the `ci-free-tier-planner` skill and
+  guard against regression.** `.agents/skills/ci-free-tier-planner/SKILL.md`
+  hard-coded plan quotas (Actions minute allowances, storage/cache sizes, and
+  the attestation / dependency-review / secret-protection / environment plan
+  gates), contradicting the project rule that volatile plan/price/quota facts
+  live only in the freshness-enforced `catalog/product-facts.yml`. A product
+  fact could expire and correctly redden the ledger while the skill still
+  served the stale number. Rewrite section 4 to hold the durable procedure and
+  reference the facts by id (`github-actions-*`, `github-attestations-*`,
+  `github-dependency-review-*`, `github-secret-scanning-*`,
+  `github-environments-*`, `github-code-quality-transition`) with fail-closed
+  resolution, and add a `check_skills.py` guard (with self-test) that fails CI
+  if any `SKILL.md` reintroduces a comma-grouped allowance, `<n> minutes`, or a
+  storage-size figure. Regenerate the `.claude/skills` mirror. Found by an
+  independent forensic review (RVR-P2-010).
+
 ### Changed
 
 - **Catalog tool inventory + currency (`catalog/tools.yml`).** Add the seven

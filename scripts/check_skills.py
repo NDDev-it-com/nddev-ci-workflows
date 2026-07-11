@@ -27,6 +27,16 @@ EXPECTED_SKILLS = {
     "ci-cost-performance", "ci-runtime-contract-testing",
 }
 PLACEHOLDERS = ("TODO_PLACEHOLDER", "<fill-me>", "TBD_PLACEHOLDER")
+# Volatile plan/price/quota figures must live only in catalog/product-facts.yml
+# (freshness-gated), never hard-coded in a static skill. Flag comma-grouped
+# allowances (e.g. "2,000"/"50,000"), "<n> minutes", and storage-size units so
+# a stale number can never masquerade as durable doctrine.
+VOLATILE_QUOTA_RE = re.compile(
+    r"\b\d{1,3}(?:,\d{3})+\b"
+    r"|\b\d[\d,]*\s+(?:hosted\s+|included\s+)?minutes\b"
+    r"|\b\d+\s?(?:MB|GB|TB)\b",
+    re.IGNORECASE,
+)
 
 
 def _frontmatter(text: str) -> dict:
@@ -36,6 +46,22 @@ def _frontmatter(text: str) -> dict:
     if end < 0:
         raise ValueError("unterminated YAML frontmatter")
     return yaml.safe_load(text[4:end]) or {}
+
+
+def _guard_selftest() -> list[str]:
+    """Prove the volatile-quota guard flags real tariffs and not false friends."""
+    problems: list[str] = []
+    must_flag = ["2,000", "50,000 included minutes", "500 MB", "cache 10 GB",
+                 "3,000 minutes"]
+    must_pass = ["50/75/90/100 percent", "version 1.7.12", "ubuntu-latest",
+                 "GB-minutes as a unit", "section 4 of 7"]
+    for sample in must_flag:
+        if not VOLATILE_QUOTA_RE.search(sample):
+            problems.append(f"check_skills self-test: guard missed {sample!r}")
+    for sample in must_pass:
+        if VOLATILE_QUOTA_RE.search(sample):
+            problems.append(f"check_skills self-test: guard false-positive {sample!r}")
+    return problems
 
 
 def check() -> list[str]:
@@ -71,6 +97,12 @@ def check() -> list[str]:
         for token in PLACEHOLDERS:
             if token in text:
                 problems.append(f"{where}: unresolved placeholder {token}")
+        for hit in VOLATILE_QUOTA_RE.finditer(text):
+            problems.append(
+                f"{where}: hard-coded volatile quota {hit.group(0)!r} — "
+                "plan/price/quota figures belong only in "
+                "catalog/product-facts.yml (reference facts by id)"
+            )
 
         mirror = MIRROR / skill_dir.name / "SKILL.md"
         if not mirror.is_file():
@@ -109,6 +141,7 @@ def check() -> list[str]:
                 f".claude/skills/{orphan}: mirror has no canonical source "
                 "(run scripts/sync_skills.py)"
             )
+    problems += _guard_selftest()
     return problems
 
 

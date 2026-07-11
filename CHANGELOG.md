@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Bump the checksum-pinned Syft SBOM generator from 1.42.3 to 1.46.0 (latest)
+  in both `release-supply-chain.yml` and `release-supply-chain-free.yml`, with
+  the release validator's `SYFT_PINS` and `catalog/tools.yml` updated in
+  lockstep (new Linux amd64/arm64 archive sizes and SHA-256s verified against
+  the upstream `syft_1.46.0_checksums.txt`). Syft is a manually pinned binary
+  outside Dependabot's reach, so it had drifted four minor versions behind;
+  this is a currency/best-practice pass, not a contract change — the SPDX-JSON
+  output and every archive/SBOM/manifest/checksum invariant are unchanged.
+
 ## [0.8.0] - 2026-07-12
 
 ### Added

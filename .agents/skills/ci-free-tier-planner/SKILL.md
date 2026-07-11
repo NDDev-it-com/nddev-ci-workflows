@@ -10,7 +10,7 @@ metadata:
   version: 1.0.0
   owner: NDDev
   status: proposed
-  reviewed_at: '2026-07-11'
+  reviewed_at: '2026-07-12'
 ---
 
 # CI Free-Tier and Zero-Spend Planner
@@ -89,20 +89,28 @@ Do not call a conditional grant a universal free tier.
 
 ### 4. Apply GitHub-native plan gates
 
-As of the fact ledger’s verification date:
+Never hard-code minute allowances, storage limits, cache sizes, or plan gates
+in this skill: they are volatile and live only in the freshness-enforced ledger
+`catalog/product-facts.yml`, where every fact carries `verified_at` /
+`expires_after` and an expired fact fails CI instead of serving a stale number.
+At execution time resolve each gate from the ledger by fact id, and treat any
+gate absent from the ledger as unknown and fail closed:
 
-- public repositories: standard GitHub-hosted runners are free/unlimited; larger runners are billed;
-- private GitHub Free: 2,000 hosted minutes/month and 500 MB shared Actions/Packages storage; cache 10 GB/repository;
-- private Pro/Team: 3,000 minutes, with different storage allowances;
-- Enterprise Cloud: 50,000 included minutes;
-- self-hosted Actions control-plane usage is free, but infrastructure and operations are not;
-- public Artifact Attestations are available; private/internal attestations require Enterprise Cloud;
-- private Dependency Review needs Team/GHEC plus Code Security/GHAS;
-- public secret scanning is free; private organization repositories need Secret Protection on Team/GHEC;
-- private environments are unavailable on GitHub Free;
-- time-sensitive products such as Code Quality require a dated transition record.
+- Actions compute and storage per visibility/plan: `github-actions-public-standard`,
+  `github-actions-private-free-personal`, `github-actions-private-free-org`,
+  `github-actions-private-pro`, `github-actions-private-team`,
+  `github-actions-private-ghec`.
+- Larger-runner and self-hosted billing: `github-actions-larger-runners`,
+  `github-actions-self-hosted-control-plane`.
+- Supply-chain and security plan gates: `github-attestations-public` /
+  `github-attestations-private`, `github-dependency-review-public` /
+  `github-dependency-review-private`, `github-secret-scanning-public` /
+  `github-secret-scanning-private-org`, `github-environments-public` /
+  `github-environments-private`.
+- Time-boxed transitions such as Code Quality: `github-code-quality-transition`.
 
-Reverify all of these before implementation.
+Never carry forward a previous period’s quota or a product name from memory;
+re-resolve every fact before planning.
 
 ### 5. Design public and private lanes separately
 

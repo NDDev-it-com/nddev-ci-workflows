@@ -11,6 +11,24 @@
   manifest records `slsa_build_level: null`. Copy-paste caller:
   `examples/release/private-free-release.yml`.
 
+### Changed
+
+- **Breaking (`monorepo-changed-paths`):** the router is now fail-closed.
+  `filters` is a strict JSON object of exact file paths or directory prefixes
+  ending in `/`; wildcard patterns — previously matched via a
+  boundary-crossing `startswith` heuristic, so `src*` also matched `src-old/`
+  — now fail the run. An explicit `base_ref`, pull-request base, or
+  `merge_group` base that cannot be resolved fails the run instead of
+  silently reporting every group unchanged (the `git diff … || true`
+  suppression is gone). Pull-request routing uses merge-base semantics,
+  `merge_group` is handled as a first-class event, and a push without a
+  usable previous tip (branch creation, force-push beyond reachable history)
+  or any other event without `base_ref` conservatively reports every group
+  as changed. `scripts/check_monorepo_routing.py` exercises the embedded
+  program against a hermetic Git-DAG fixture matrix (invalid bases,
+  zero/unreachable `before`, multi-commit pushes, prefix boundaries,
+  renames, deletions, unusual filenames) via `validate_all`.
+
 ### Fixed
 
 - Tier truth for GitHub Artifact Attestations: on the Free, Pro, and Team

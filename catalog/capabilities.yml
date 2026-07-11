@@ -999,10 +999,10 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Workflow is present on disk and validated by generated workflow inventory"
-      - "Path-filter matrices must fail safe (run everything) when the filter cannot resolve a merge base"
+      - "Strict filter language: exact file paths or '/'-terminated directory prefixes; wildcards fail the run (the pre-0.6 startswith matcher crossed prefix boundaries)"
+      - "Fail-closed routing: unresolvable base_ref/PR/merge_group bases fail the run; a push without a usable previous tip conservatively reports every group as changed"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-11"
     sources:
       - "https://docs.github.com/en/actions/using-workflows/reusing-workflows"
 

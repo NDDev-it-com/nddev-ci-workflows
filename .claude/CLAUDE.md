@@ -66,6 +66,19 @@ programs), so a failure message usually names the exact broken contract.
   (`check_monorepo_routing.py` fixtures).
 - **Runner honesty.** `actionlint.yml` guards Linux X64 as step one;
   `release-supply-chain*.yml` validate Linux X64/ARM64 before checkout.
+- **Runtime-coverage proof integrity.** In `catalog/runtime-coverage.yml` a
+  `runtime-proven` record needs a repo-scoped `…/actions/runs/<id>` URL **and**
+  a `proven_digest` (sha256 of the workflow file) that
+  `validate_runtime_coverage.py` recomputes and matches. Editing any proven
+  workflow (`release-supply-chain.yml`, `actionlint.yml`, `zizmor-sarif.yml`)
+  therefore fails the gate — the "static-only dance": re-run the reusable and
+  update the digest, or drop the record to `static-only`, until the next run
+  re-proves it. Never leave a stale run masquerading as proof.
+- **Runtime bundle ⊆ source archive.** `release-supply-chain*.yml` refuse a
+  `runtime_paths` selection outside `archive_paths`, so the Syft-scanned source
+  SBOM stays a superset of everything the release ships. `release.yml` never
+  sets `runtime_paths`, so that path is covered only by
+  `check_release_supply_chain.py` fixtures (not the self-release).
 - **Security invariants.** Full-SHA pins with `# vX.Y.Z` comments;
   `permissions: {}` top-level + least-privilege jobs; `timeout-minutes`
   everywhere; `persist-credentials: false`; no `${{ ... }}` inside `run:`

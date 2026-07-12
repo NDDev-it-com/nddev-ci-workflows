@@ -1,0 +1,64 @@
+schema_version: 1
+
+repository:
+  id: "repo_01KX8PR6R8YJETP3PV4H7E608B"
+  display_name: "nddev-ci-workflows"
+  roles:
+    - "project"
+    - "module"
+  lifecycle: "active"
+
+provider:
+  type: "github"
+  installation: "installation:github-organization"
+  repository_id: 1289065451
+  owner: "NDDev-it-com"
+  name: "nddev-ci-workflows"
+
+classification:
+  portfolios:
+    - "portfolio:organization-projects"
+    - "portfolio:public-modules"
+  visibility_contract: "public"
+  data_classification: "public"
+
+policy:
+  profiles:
+    - "repository-default"
+    - "organization-default"
+    - "public-module"
+  rollout_ring: "canary-modules"
+
+git:
+  default_branch: "main"
+  integration: "pull-request"
+  branch_model: "task-branches"
+  handoff_pr: "preferred"
+  cleanup: "merged-only"
+
+verification:
+  commands:
+    test:
+      - "python3 scripts/validate_all.py"
+  required:
+    - "test"
+
+agent:
+  context_profile: "public-module"
+  generated_agents: false
+  serena:
+    enabled: false
+    provenance_required: false
+
+module:
+  contract: "public"
+  consumption:
+    - "runtime-service"
+  compatibility: "semver"
+  pin_policy: "default-branch-commit"
+  publication:
+    registry: "none"
+    github_release: "required"
+
+release:
+  mode: "github-release"

@@ -15,12 +15,17 @@ repositories pin by full commit SHA. Docs under `docs/` are human mirrors;
   external plan/price/quota facts. Never hand-copy a tariff into prose; every
   live fact carries `verified_at`/`expires_after` and
   `scripts/validate_product_facts.py` fails CI once a fact expires. Capabilities
-  link their tier claims to facts via the optional `product_facts` field.
+  link their tier claims to facts via the optional `product_facts` field. A
+  companion `scripts/check_skills.py` guard fails CI if any `SKILL.md` hard-codes
+  a quota figure (comma-grouped allowance, `<n> minutes`, or a storage size).
 - `catalog/runtime-coverage.yml` is the honest runtime-evidence ledger for every
-  reusable workflow (`runtime-proven` needs a real run URL; `static-only` names
-  its validator; `unverified` is the default; `waived` needs owner/reason/
-  expiry). Do not upgrade a workflow to `runtime-proven` without an observed
-  `workflow_call` run.
+  reusable workflow (`runtime-proven` needs a repo-scoped `…/actions/runs/<id>`
+  URL **and** a `proven_digest` = sha256 of the workflow file, which
+  `validate_runtime_coverage.py` recomputes and matches; `static-only` names its
+  validator; `unverified` is the default; `waived` needs owner/reason/expiry).
+  Editing any proven workflow fails the gate on the digest mismatch — re-run and
+  re-record, or drop to `static-only`, until a fresh run re-proves it. Never
+  upgrade to `runtime-proven` without an observed `workflow_call` run.
 - `docs/generated/*` is generated — never edit by hand. After a catalog,
   product-fact, or workflow change run `python3 scripts/generate_docs.py`; CI
   fails on drift.

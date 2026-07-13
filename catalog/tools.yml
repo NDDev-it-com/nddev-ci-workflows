@@ -1,7 +1,7 @@
 # External tools referenced by nddev-ci-workflows.
 # Machine-readable source of truth. Mirrored by docs/. Enforced by scripts/validate_catalog.py.
 # Action `pin` values are full commit SHAs (tags are mutable); CLIs pin by version/checksum and use null here.
-# Last verified: 2026-07-12
+# Last verified: 2026-07-13
 
 tools:
   - id: actionlint
@@ -371,11 +371,11 @@ tools:
     name: bridgecrewio/checkov-action
     homepage: "https://github.com/bridgecrewio/checkov-action"
     kind: action
-    current_version: "v12.1347.0"
-    pin: "bridgecrewio/checkov-action@99bb2caf247dfd9f03cf984373bc6043d4e32ebf"
+    current_version: "v12.3112.0"
+    pin: "bridgecrewio/checkov-action@a7683e7b72a04503521247973281ec8142e1ac1f"
     used_by:
       - .github/workflows/iac-scan.yml
-    last_verified: "2026-07-08"
+    last_verified: "2026-07-13"
 
   - id: github-action-benchmark
     name: benchmark-action/github-action-benchmark

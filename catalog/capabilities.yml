@@ -878,10 +878,12 @@ capabilities:
     required_settings: []
     risks:
       - "Workflow is present on disk and validated by generated workflow inventory"
+      - "Checkout is shallow by default; ancestry-aware checks must set fetch_depth to 0"
     deprecations: null
-    last_verified: "2026-07-04"
+    last_verified: "2026-07-13"
     sources:
       - "https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go"
+      - "https://github.com/actions/checkout/blob/9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0/action.yml#L74-L76"
 
   - id: rust-ci
     name: Rust CI

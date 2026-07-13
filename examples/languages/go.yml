@@ -12,4 +12,6 @@ jobs:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/go-ci.yml@<sha>
     with:
+      # Required when validation inspects commit ancestry or pull-request merge parents.
+      fetch_depth: 0
       test_command: 'go test -race ./...'

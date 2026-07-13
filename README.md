@@ -65,6 +65,10 @@ Always pin by **full commit SHA** (tags are mutable). Dependabot bumps the SHA.
 A caller job **must grant every permission the reusable job declares**, or the
 run fails at startup — see [`docs/04-actions-core.md`](docs/04-actions-core.md).
 
+`go-ci.yml` keeps checkout shallow by default (`fetch_depth: 1`). Set
+`fetch_depth: 0` when a validation command inspects commit ancestry or pull
+request merge parents; tree-only builds can retain the faster default.
+
 ### Public repository
 
 Security suite (push + PR):

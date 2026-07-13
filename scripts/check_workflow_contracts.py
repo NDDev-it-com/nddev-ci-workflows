@@ -4,13 +4,14 @@
 workflows must NOT be reusable, and `ci.yml` must expose the `ci-gate` job that
 branch protection requires as a status check. Caller-provided command runners
 must also fail on the first failing command instead of returning the status of
-only the final command.
+only the final command. The Go pack's history-depth input remains a typed,
+backward-compatible pass-through to checkout.
 """
 from __future__ import annotations
 
 import sys
 
-from _workflow_yaml import SELF_WORKFLOWS, is_reusable, load_yaml, workflow_files
+from _workflow_yaml import SELF_WORKFLOWS, get_on, is_reusable, load_yaml, workflow_files
 
 
 def check() -> list[str]:
@@ -28,6 +29,38 @@ def check() -> list[str]:
     jobs = ci.get("jobs", {}) or {}
     if "ci-gate" not in jobs:
         problems.append("ci.yml: missing required `ci-gate` job (branch-protection status check)")
+
+    go_ci = load_yaml((workflow_files()[0].parent / "go-ci.yml"))
+    go_on = get_on(go_ci)
+    go_call = go_on.get("workflow_call", {}) if isinstance(go_on, dict) else {}
+    go_inputs = go_call.get("inputs", {}) if isinstance(go_call, dict) else {}
+    fetch_depth = go_inputs.get("fetch_depth", {}) if isinstance(go_inputs, dict) else {}
+    if not isinstance(fetch_depth, dict) or (
+        fetch_depth.get("type") != "number" or fetch_depth.get("default") != 1
+    ):
+        problems.append(
+            "go-ci.yml: fetch_depth must remain a number with the "
+            "backward-compatible default 1"
+        )
+    go_steps = go_ci.get("jobs", {}).get("go", {}).get("steps", [])
+    checkout = next(
+        (
+            step
+            for step in go_steps
+            if isinstance(step, dict) and step.get("name") == "Checkout"
+        ),
+        {},
+    )
+    checkout_with = checkout.get("with", {})
+    actual_depth = (
+        checkout_with.get("fetch-depth")
+        if isinstance(checkout_with, dict)
+        else None
+    )
+    if actual_depth != "${{ inputs.fetch_depth }}":
+        problems.append(
+            "go-ci.yml: Checkout must pass fetch_depth through to actions/checkout"
+        )
 
     private_static = load_yaml((workflow_files()[0].parent / "private-static.yml"))
     static_steps = private_static.get("jobs", {}).get("static", {}).get("steps", [])

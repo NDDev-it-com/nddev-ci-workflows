@@ -91,9 +91,10 @@ entries:
     last_run: null
     waiver: null
   - workflow: .github/workflows/iac-scan.yml
-    status: unverified
-    evidence: 'No observed consumer run; static checks (actionlint/zizmor/pins/permissions) pass but do not prove workflow_call startup, tier, event, or runner lanes.'
-    last_run: null
+    status: runtime-proven
+    evidence: "Called from an isolated same-repository push proof at c4cd369; Checkov 3.3.6 scanned an intentionally unsafe Terraform fixture, reported seven CKV failures, and respected soft_fail: true."
+    last_run: https://github.com/NDDev-it-com/nddev-ci-workflows/actions/runs/29260835832
+    proven_digest: 5f94060b4821c693415704530c1938838b66de1c98d4c9ec832dfd9b36336f68
     waiver: null
   - workflow: .github/workflows/java-ci.yml
     status: unverified

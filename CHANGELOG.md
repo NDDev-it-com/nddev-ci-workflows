@@ -10,6 +10,15 @@
 
 ### Changed
 
+- Update the full-SHA-pinned Checkov action from `v12.1347.0` to
+  `v12.3112.0`, including its bundled Checkov engine change from `2.0.930` to
+  `3.3.6`. Record live `workflow_call` evidence from an isolated Terraform
+  fixture that produced seven expected CKV findings while honoring
+  `soft_fail: true`. The upstream action still references its engine image by
+  the mutable `ghcr.io/bridgecrewio/checkov:3.3.6` tag; the outer action commit
+  remains immutable, but that nested image is a documented residual
+  supply-chain risk.
+
 - Exclude `swift-actions/setup-swift` from the broad GitHub Actions Dependabot
   group so major Swift action updates receive a separate review and runtime
   consumer proof instead of blocking unrelated stable action updates.

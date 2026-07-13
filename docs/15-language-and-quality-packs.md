@@ -34,6 +34,10 @@ These join the existing Python, Node, Go, Rust, Java, .NET, container, and
 Terraform packs. Swift defaults to a macOS runner (10x minute multiplier); its
 SwiftLint step runs on macOS only.
 
+The Go pack checks out one commit by default. Callers whose validation reads
+Git ancestry or pull-request merge parents must set `fetch_depth: 0`; the
+default remains `1` for backward compatibility and faster tree-only builds.
+
 ## Quality gates
 
 | Pack | Workflow | Tiers | Example |

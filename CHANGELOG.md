@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Add an opt-in `fetch_depth` input to `go-ci.yml`, preserving the shallow
+  default while allowing ancestry-aware validation to fetch pull-request merge
+  parents with `fetch_depth: 0`.
+
 ### Changed
 
 - Make `private-static.yml` caller-provided install and validation command

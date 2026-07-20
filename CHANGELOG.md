@@ -2,6 +2,43 @@
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-07-20
+
+### Changed
+
+- **BREAKING — uv and bun are now the only language/user-space package managers
+  used by this library.** Every reusable workflow and self-CI step that
+  previously shelled out to `pip`/`pipx`/`poetry` or `npm`/`npx`/`pnpm`/`yarn`
+  now uses `astral-sh/setup-uv` (uv `0.11.29`) for Python and
+  `oven-sh/setup-bun` (bun `1.3.14`) for JavaScript. Callers relying on the
+  removed inputs or the old install/lint defaults must update their invocations:
+  - `python-ci.yml`: `actions/setup-python` + pip is replaced by `setup-uv`
+    (pinned via the new `uv_version` input, default `0.11.29`) with
+    `enable-cache: true`; Python is provisioned with `uv python install`. The
+    `install_command` default changes from `python -m pip install --upgrade pip`
+    to `uv sync --frozen`. The pip-specific `cache` and `cache_dependency_path`
+    inputs are removed (setup-uv caches automatically).
+  - `node-ci.yml`: `actions/setup-node` + `npm ci` is replaced by `setup-bun`
+    (new `bun_version` input, default `1.3.14`); the `install_command` default
+    changes to `bun install --frozen-lockfile`. The `node_version`, `cache`, and
+    `cache_dependency_path` inputs are removed.
+  - `web-ci.yml`: `setup-node` is replaced by `setup-bun`; the default
+    `lint_command` now runs `bunx stylelint … && bunx htmlhint …`. The
+    `node_version`, `cache`, and `cache_dependency_path` inputs are removed in
+    favor of `bun_version`.
+  - `ci.yml`: validator dependencies install via `uv pip install --system
+    --require-hashes -r requirements-ci.txt` (hash-pinning preserved). The
+    Harden-Runner egress allowlist adds the uv download hosts.
+  - `zizmor-sarif.yml`, `zizmor-no-sarif.yml`, `semgrep-ci.yml`, `sql-ci.yml`:
+    the pinned tools now run ephemerally via `uvx tool@<version>` instead of a
+    `pip install` step; the unpinned latest-install fallbacks are removed.
+
+### Removed
+
+- `pip`/`pipx`/`poetry` and `npm`/`npx` executable invocations from all
+  `.github/workflows/*.yml`. Prose, input descriptions, and copy-paste examples
+  that merely mention those managers are unchanged.
+
 ### Fixed
 
 - Add an opt-in `fetch_depth` input to `go-ci.yml`, preserving the shallow

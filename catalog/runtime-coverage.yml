@@ -225,8 +225,7 @@ entries:
     last_run: null
     waiver: null
   - workflow: .github/workflows/zizmor-sarif.yml
-    status: runtime-proven
-    evidence: "Called by this repo's ci.yml on every run; SARIF lane executed live."
-    last_run: https://github.com/NDDev-it-com/nddev-ci-workflows/actions/runs/29172553315
-    proven_digest: 68e4560b4808cde18826abc0045b6d2b65a3dc4237391bf4a5c22fc54e563849
+    status: unverified
+    evidence: 'Migrated to the uv/uvx toolchain in v0.11.0; the prior runtime-proven run (run 29172553315) predates the migration, so the workflow must be re-run live under ci.yml before it can reclaim runtime-proven.'
+    last_run: null
     waiver: null

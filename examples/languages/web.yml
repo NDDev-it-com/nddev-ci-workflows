@@ -11,6 +11,3 @@ jobs:
   web:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/web-ci.yml@<sha>
-    with:
-      node_version: '22'
-      cache: npm

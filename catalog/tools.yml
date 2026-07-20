@@ -150,8 +150,7 @@ tools:
     current_version: "v6.3.0"
     pin: "actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1"
     used_by:
-      - .github/workflows/zizmor-sarif.yml
-      - .github/workflows/zizmor-no-sarif.yml
+      - .github/workflows/ci.yml
       - .github/workflows/cross-platform-smoke.yml
       - .github/workflows/private-static.yml
     last_verified: "2026-07-04"
@@ -398,9 +397,33 @@ tools:
       - .github/workflows/benchmark.yml
       - .github/workflows/benchmark-compare.yml
       - .github/workflows/mutation-testing.yml
+    last_verified: "2026-07-12"
+
+  - id: setup-uv
+    name: astral-sh/setup-uv
+    homepage: "https://github.com/astral-sh/setup-uv"
+    kind: action
+    current_version: "v8.3.2"
+    pin: "astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990"
+    used_by:
+      - .github/workflows/ci.yml
+      - .github/workflows/python-ci.yml
+      - .github/workflows/semgrep-ci.yml
+      - .github/workflows/sql-ci.yml
+      - .github/workflows/zizmor-sarif.yml
+      - .github/workflows/zizmor-no-sarif.yml
+    last_verified: "2026-07-20"
+
+  - id: setup-bun
+    name: oven-sh/setup-bun
+    homepage: "https://github.com/oven-sh/setup-bun"
+    kind: action
+    current_version: "v2.2.0"
+    pin: "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6"
+    used_by:
       - .github/workflows/node-ci.yml
       - .github/workflows/web-ci.yml
-    last_verified: "2026-07-12"
+    last_verified: "2026-07-20"
 
   - id: setup-go
     name: actions/setup-go

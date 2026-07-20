@@ -10,5 +10,5 @@ jobs:
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/mutation-testing.yml@<sha>
     with:
       language: python
-      install_command: 'pip install mutmut'
+      install_command: 'uv tool install mutmut'
       mutation_command: 'mutmut run'

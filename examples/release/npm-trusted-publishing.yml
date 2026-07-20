@@ -1,6 +1,6 @@
-# npm Trusted Publishing via OIDC.
-# Replace @<sha> with pinned full SHAs for actions. npm trusted publishing
-# currently requires GitHub-hosted runners; do not run this on self-hosted.
+# Publish a package to the npm registry with Bun (uv/bun-only policy: no npm CLI).
+# Replace @<sha> with pinned full SHAs for actions. Provide a scoped registry
+# token via secrets (BUN_AUTH_TOKEN); run only on GitHub-hosted runners.
 name: release-npm
 on:
   push:
@@ -20,11 +20,11 @@ jobs:
       - uses: actions/checkout@<sha>
         with:
           persist-credentials: false
-      - uses: actions/setup-node@<sha>
+      - uses: oven-sh/setup-bun@<sha>
         with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-          cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm publish
+          bun-version: '1.3.14'
+      - run: bun install --frozen-lockfile
+      - run: bun test
+      - env:
+          BUN_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bun publish

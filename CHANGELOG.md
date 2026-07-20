@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-07-20
+
+Supersedes 0.11.0, whose tag was burned by an accidental immutable pre-release.
+No functional change from 0.11.0.
+
 ## [0.11.0] - 2026-07-20
 
 ### Changed

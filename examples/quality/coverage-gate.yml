@@ -13,7 +13,7 @@ jobs:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/coverage-gate.yml@<sha>
     with:
-      coverage_command: 'pip install -e ".[test]" && pytest --cov --cov-report=xml'
+      coverage_command: 'uv sync --frozen && uv run pytest --cov --cov-report=xml'
       files: coverage.xml
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}

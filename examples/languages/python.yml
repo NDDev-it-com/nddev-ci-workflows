@@ -13,6 +13,5 @@ jobs:
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/python-ci.yml@<sha>
     with:
       python_version: '3.13'
-      cache: pip
-      install_command: 'python -m pip install -e ".[test]"'
-      test_command: 'pytest'
+      install_command: 'uv sync --frozen'
+      test_command: 'uv run pytest'

@@ -12,6 +12,5 @@ jobs:
     permissions: { contents: read }
     uses: NDDev-it-com/nddev-ci-workflows/.github/workflows/node-ci.yml@<sha>
     with:
-      node_version: '22'
-      cache: npm
-      test_command: 'npm test'
+      install_command: 'bun install --frozen-lockfile'
+      test_command: 'bun test'

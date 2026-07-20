@@ -1,8 +1,8 @@
 name: python-ci
 
-# Reusable Python CI for BOTH tiers: pinned setup-python with
-# optional dependency cache, and caller-provided install/test commands passed
-# via env (no `${{ inputs.* }}` inline in run:).
+# Reusable Python CI for BOTH tiers: pinned astral-sh/setup-uv with dependency
+# caching, a uv-managed Python toolchain, and caller-provided install/test
+# commands passed via env (no `${{ inputs.* }}` inline in run:).
 
 on:
   workflow_call:
@@ -16,17 +16,14 @@ on:
       working_directory:
         type: string
         default: '.'
-      cache:
-        description: 'setup-python cache: pip, poetry, pipenv, or empty to disable.'
+      uv_version:
+        description: 'Exact astral-sh/uv version to pin.'
         type: string
-        default: ''
-      cache_dependency_path:
-        type: string
-        default: ''
+        default: '0.11.29'
       install_command:
         description: 'Dependency install command (bash). Empty to skip.'
         type: string
-        default: 'python -m pip install --upgrade pip'
+        default: 'uv sync --frozen'
       test_command:
         description: 'Test/verify command (bash).'
         type: string
@@ -57,12 +54,16 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+      - name: Set up uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
-          python-version: ${{ inputs.python_version }}
-          cache: ${{ inputs.cache }}
-          cache-dependency-path: ${{ inputs.cache_dependency_path }}
+          version: ${{ inputs.uv_version }}
+          enable-cache: true
+
+      - name: Install Python
+        env:
+          PY_VERSION: ${{ inputs.python_version }}
+        run: uv python install "$PY_VERSION"
 
       - name: Install dependencies
         if: ${{ inputs.install_command != '' }}

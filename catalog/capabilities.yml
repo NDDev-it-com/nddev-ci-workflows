@@ -1060,7 +1060,7 @@ capabilities:
       - "contents: read"
     required_settings: []
     risks:
-      - "Default lint uses npx to fetch stylelint/htmlhint at runtime; pin them in package.json for reproducible CI"
+      - "Default lint uses bunx to fetch stylelint/htmlhint at runtime; pin them in package.json for reproducible CI"
       - "Private-repo runner minutes are metered beyond the included free allotment"
     deprecations: null
     last_verified: "2026-07-08"

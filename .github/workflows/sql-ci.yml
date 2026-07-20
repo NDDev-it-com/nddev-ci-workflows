@@ -61,28 +61,20 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+      - name: Set up uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990  # v8.3.2
         with:
-          python-version: ${{ inputs.python_version }}
-
-      - name: Install sqlfluff
-        env:
-          SQLFLUFF_VERSION: ${{ inputs.sqlfluff_version }}
-        run: |
-          if [ -n "$SQLFLUFF_VERSION" ]; then
-            python -m pip install --disable-pip-version-check "sqlfluff==${SQLFLUFF_VERSION}"
-          else
-            python -m pip install --disable-pip-version-check sqlfluff
-          fi
+          version: 0.11.29
 
       - name: Lint
         if: ${{ inputs.lint }}
         env:
           SQL_DIALECT: ${{ inputs.dialect }}
           SQL_PATHS: ${{ inputs.paths }}
+          SQLFLUFF_VERSION: ${{ inputs.sqlfluff_version }}
         run: |
-          sqlfluff lint --dialect "$SQL_DIALECT" "$SQL_PATHS"
+          set -euo pipefail
+          uvx "sqlfluff${SQLFLUFF_VERSION:+@$SQLFLUFF_VERSION}" lint --dialect "$SQL_DIALECT" "$SQL_PATHS"
           echo "sqlfluff lint (${SQL_DIALECT}) passed." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Extra command

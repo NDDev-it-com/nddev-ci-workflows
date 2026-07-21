@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggregate static validator for nddev-ci-workflows.
+"""Aggregate static validator for ci-workflows.
 
 Runs every repository self-check and exits non-zero if any fails. This is the
 single source of truth invoked by `ci.yml` and by contributors locally.

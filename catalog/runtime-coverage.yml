@@ -91,10 +91,9 @@ entries:
     last_run: null
     waiver: null
   - workflow: .github/workflows/iac-scan.yml
-    status: runtime-proven
-    evidence: "Called from an isolated same-repository push proof at c4cd369; Checkov 3.3.6 scanned an intentionally unsafe Terraform fixture, reported seven CKV failures, and respected soft_fail: true."
-    last_run: https://github.com/NDDev-it-com/nddev-ci-workflows/actions/runs/29260835832
-    proven_digest: 5f94060b4821c693415704530c1938838b66de1c98d4c9ec832dfd9b36336f68
+    status: unverified
+    evidence: 'Previously runtime-proven at run 29260835832 (Checkov 3.3.6, seven CKV failures, soft_fail honored); the checkov-action wrapper was bumped v12.3112->v12.3114 (Dependabot), changing the workflow bytes. Re-run the reusable to restore runtime-proven.'
+    last_run: null
     waiver: null
   - workflow: .github/workflows/java-ci.yml
     status: unverified

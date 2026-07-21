@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [0.11.3] - 2026-07-21
+
+### Changed
+
+- Bump pinned GitHub Actions (Dependabot): setup-node v6->v7, setup-java
+  v5.5->v5.6, checkov-action v12.3112->v12.3114, setup-swift v2.4->v3.
+- Downgrade iac-scan runtime-coverage to `unverified` after the checkov-action
+  byte change (re-run the reusable to restore runtime-proven).
+
 ## [0.11.2] - 2026-07-21
 
 ### Changed

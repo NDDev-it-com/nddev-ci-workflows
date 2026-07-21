@@ -506,14 +506,14 @@ facts:
   overage: AI usage and Actions minutes may add cost
   status: official
   source_authority: primary
-  verified_at: '2026-07-11'
-  expires_after: '2026-07-20'
+  verified_at: '2026-07-21'
+  expires_after: '2026-10-21'
   source_urls:
   - https://github.blog/changelog/2026-06-16-github-code-quality-generally-available-july-20-2026/
   - https://docs.github.com/en/billing/concepts/product-billing/github-code-quality
   notes:
-  - 'Time-sensitive transition: refresh immediately on or after 2026-07-20.'
-  - 'Verified 2026-07-11 against the changelog and billing docs: GA 2026-07-20, $10/active committer/month, usage-based AI, CodeQL consumes Actions minutes, Team + Enterprise Cloud only (not Enterprise Server).'
+  - 'GA + paid transition completed 2026-07-20 as scheduled; no longer time-critical.'
+  - 'Re-verified 2026-07-21 against the billing docs: standalone per-active-committer license ($10/active committer/month), CodeQL scans consume Actions minutes, AI features consume AI credits at $0.01/credit, independent of Advanced Security licenses; Team + Enterprise Cloud.'
 - id: gitlab-free-hosted
   provider: GitLab
   product: GitLab.com Free compute

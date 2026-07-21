@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.11.2] - 2026-07-21
+
+### Changed
+
+- Bump pinned uv `0.11.29` -> `0.11.30` across the setup-uv workflows and examples.
+- Refresh the `github-code-quality-transition` product fact: the GA/paid
+  transition completed 2026-07-20 as scheduled; re-verified 2026-07-21.
+
 ## [0.11.1] - 2026-07-20
 
 Supersedes 0.11.0, whose tag was burned by an accidental immutable pre-release.
@@ -14,11 +22,11 @@ No functional change from 0.11.0.
 - **BREAKING — uv and bun are now the only language/user-space package managers
   used by this library.** Every reusable workflow and self-CI step that
   previously shelled out to `pip`/`pipx`/`poetry` or `npm`/`npx`/`pnpm`/`yarn`
-  now uses `astral-sh/setup-uv` (uv `0.11.29`) for Python and
+  now uses `astral-sh/setup-uv` (uv `0.11.30`) for Python and
   `oven-sh/setup-bun` (bun `1.3.14`) for JavaScript. Callers relying on the
   removed inputs or the old install/lint defaults must update their invocations:
   - `python-ci.yml`: `actions/setup-python` + pip is replaced by `setup-uv`
-    (pinned via the new `uv_version` input, default `0.11.29`) with
+    (pinned via the new `uv_version` input, default `0.11.30`) with
     `enable-cache: true`; Python is provisioned with `uv python install`. The
     `install_command` default changes from `python -m pip install --upgrade pip`
     to `uv sync --frozen`. The pip-specific `cache` and `cache_dependency_path`

@@ -19,7 +19,7 @@ on:
       uv_version:
         description: 'Exact astral-sh/uv version to pin.'
         type: string
-        default: '0.11.29'
+        default: '0.11.30'
       install_command:
         description: 'Dependency install command (bash). Empty to skip.'
         type: string

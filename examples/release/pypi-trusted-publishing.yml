@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@<sha>
         with:
-          version: "0.11.29"
+          version: "0.11.30"
       - run: uv build
       - uses: actions/upload-artifact@<sha>
         with:

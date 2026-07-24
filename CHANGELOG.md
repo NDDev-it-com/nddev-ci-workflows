@@ -2,6 +2,24 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **The catalog recorded four action pins that no workflow used.** `setup-node`,
+  `setup-java`, `setup-swift`, and `checkov-action` had drifted a version behind
+  the SHA their `used_by` workflows actually reference — `setup-swift` by a full
+  major (`v2.4.0` recorded, `v3` shipped). `validate_catalog.py` checked only the
+  pin's *shape* and that `used_by` paths existed, never that the pin matched
+  reality, so the gate stayed green while the declared source of truth was wrong
+  in four places. Pins synced and `validate_catalog.py` now fails when a
+  catalog pin does not appear verbatim in each of its `used_by` workflows.
+- **`sql-ci.yml` declared a `python_version` input that nothing read.** It was
+  the only never-read input across all reusables; the workflow has no
+  `setup-python` step at all and provisions Python through `setup-uv`. A caller
+  passing it got a silently ignored value. Input removed and the header comment
+  corrected from "pinned setup-python" to "pinned setup-uv".
+- `docs/12-community-dx.md` listed five community-health files as still missing;
+  all five have shipped. Only the optional `.github/FUNDING.yml` remains absent.
+
 ### Added
 
 - **Self-application of the public OSS security suite.** This repository shipped
